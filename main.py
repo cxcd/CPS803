@@ -5,6 +5,12 @@ import pretty_midi
 
 x = np.arange(100).reshape(10, 10)
 
+test_notes = np.array([
+        pretty_midi.Note(velocity=100, pitch=pretty_midi.note_name_to_number('C5'), start=0, end=1),
+        pretty_midi.Note(velocity=100, pitch=pretty_midi.note_name_to_number('Eb5'), start=1, end=2),
+        pretty_midi.Note(velocity=100, pitch=pretty_midi.note_name_to_number('G5'), start=2, end=3)
+        ])
+
 @jit(nopython=True) # Set "nopython" mode for best performance, equivalent to @njit
 def go_fast(a): # Function is compiled to machine code when called the first time
     trace = 0.0
@@ -18,18 +24,14 @@ def read_midi(midi_path):
     for i in midi_data.instruments[0].notes:
         print(i)
 
-def make_midi(output_path):
+
+# Output an array of notes to the desired path
+def make_piano_midi(output_path, notes):
     # Create the output structure
     output = pretty_midi.PrettyMIDI()
     # Create the instrument program and instrument
     piano_program = pretty_midi.instrument_name_to_program('Acoustic Grand Piano')
     piano = pretty_midi.Instrument(program=piano_program)
-    # Simple list of notes - C minor
-    notes = np.array([
-        pretty_midi.Note(velocity=100, pitch=pretty_midi.note_name_to_number('C5'), start=0, end=1),
-        pretty_midi.Note(velocity=100, pitch=pretty_midi.note_name_to_number('Eb5'), start=1, end=2),
-        pretty_midi.Note(velocity=100, pitch=pretty_midi.note_name_to_number('G5'), start=2, end=3)
-        ])
     # Set the piano notes to the list of notes
     piano.notes = notes
     # Give the output our instrument
@@ -39,4 +41,4 @@ def make_midi(output_path):
 
 if __name__ == '__main__':
     #read_midi(midi_path=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'example.midi'))
-    make_midi('piano-C-chord.mid')
+    make_piano_midi('piano-C-chord.mid', test_notes)
