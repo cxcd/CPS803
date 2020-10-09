@@ -41,4 +41,4 @@ def main(read_path="", write_path="", notes=None):
 
 if __name__ == '__main__':
     main(read_path=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'example.midi'))
-    # main(ntoes=test_notes, write_path='output.midi')
+    # main(notes=test_notes, write_path='output.midi')
