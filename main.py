@@ -9,11 +9,16 @@ test_notes = np.array([
         pretty_midi.Note(velocity=100, pitch=pretty_midi.note_name_to_number('G5'), start=2, end=3)
         ])
 
-def read_midi(midi_path):
-    midi_data = pretty_midi.PrettyMIDI('example.midi')
-    for i in midi_data.instruments[0].notes:
-        print(i)
-
+def midi_to_array(midi_path):
+    # Get MIDI data
+    data = pretty_midi.PrettyMIDI('example.midi').instruments[0].notes
+    # Init 4D array
+    array = np.zeros((len(data),4))
+    # Add MIDI data to array
+    for i in range(len(data)):
+        array[i] = ([data[i].start, data[i].end, data[i].pitch, data[i].velocity])
+    # Return array
+    return array
 
 # Output an array of notes to the desired path
 def make_piano_midi(notes, output_path):
@@ -29,6 +34,10 @@ def make_piano_midi(notes, output_path):
     # Write the output
     output.write(output_path)
 
+def main(read_path="", write_path="", notes=None):
+    print(midi_to_array(read_path))
+    # make_piano_midi(notes, write_path)
+
 if __name__ == '__main__':
-    #read_midi(midi_path=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'example.midi'))
-    make_piano_midi(test_notes, 'output.midi')
+    main(read_path=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'example.midi'))
+    # main(ntoes=test_notes, write_path='output.midi')
