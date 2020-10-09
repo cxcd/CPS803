@@ -3,21 +3,11 @@ from numba import jit
 import numpy as np
 import pretty_midi
 
-x = np.arange(100).reshape(10, 10)
-
 test_notes = np.array([
         pretty_midi.Note(velocity=100, pitch=pretty_midi.note_name_to_number('C5'), start=0, end=1),
         pretty_midi.Note(velocity=100, pitch=pretty_midi.note_name_to_number('Eb5'), start=1, end=2),
         pretty_midi.Note(velocity=100, pitch=pretty_midi.note_name_to_number('G5'), start=2, end=3)
         ])
-
-@jit(nopython=True) # Set "nopython" mode for best performance, equivalent to @njit
-def go_fast(a): # Function is compiled to machine code when called the first time
-    trace = 0.0
-    for i in range(a.shape[0]):   # Numba likes loops
-        trace += np.tanh(a[i, i]) # Numba likes NumPy functions
-    return a + trace              # Numba likes NumPy broadcasting
-
 
 def read_midi(midi_path):
     midi_data = pretty_midi.PrettyMIDI('example.midi')
