@@ -21,7 +21,7 @@ def midi_to_array(midi_path):
     return array
 
 # Output an array of notes to the desired path
-def make_piano_midi(notes, output_path):
+def write_piano_midi(notes, write_path):
     # Create the output structure
     output = pretty_midi.PrettyMIDI()
     # Create the instrument program and instrument
@@ -32,11 +32,11 @@ def make_piano_midi(notes, output_path):
     # Give the output our instrument
     output.instruments.append(piano)
     # Write the output
-    output.write(output_path)
+    output.write(write_path)
 
 def main(read_path="", write_path="", notes=None):
     print(midi_to_array(read_path))
-    # make_piano_midi(notes, write_path)
+    # write_piano_midi(notes, write_path)
 
 if __name__ == '__main__':
     main(read_path=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'example.midi'))
