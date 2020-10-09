@@ -26,7 +26,7 @@ def read_midi(midi_path):
 
 
 # Output an array of notes to the desired path
-def make_piano_midi(output_path, notes):
+def make_piano_midi(notes, output_path):
     # Create the output structure
     output = pretty_midi.PrettyMIDI()
     # Create the instrument program and instrument
@@ -41,4 +41,4 @@ def make_piano_midi(output_path, notes):
 
 if __name__ == '__main__':
     #read_midi(midi_path=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'example.midi'))
-    make_piano_midi('piano-C-chord.mid', test_notes)
+    make_piano_midi(test_notes, 'piano-C-chord.mid')
