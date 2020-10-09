@@ -36,9 +36,8 @@ def write_piano_midi(notes, write_path):
     output.write(write_path)
 
 def main(read_path="", write_path="", notes=None):
-    print(midi_to_array(read_path))
-    # write_piano_midi(notes, write_path)
+    # print(midi_to_array(read_path))
+    write_piano_midi(notes, write_path)
 
 if __name__ == '__main__':
-    main(read_path=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'example.midi'))
-    # main(notes=test_notes, write_path='output.midi')
+    main(read_path=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'example.midi'), notes=test_notes, write_path='output.midi')
