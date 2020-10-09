@@ -11,7 +11,7 @@ test_notes = np.array([
 
 def midi_to_array(midi_path):
     # Get MIDI data
-    data = pretty_midi.PrettyMIDI('example.midi').instruments[0].notes
+    data = pretty_midi.PrettyMIDI(midi_path).instruments[0].notes
     # Init 4D array
     array = np.zeros((len(data),4))
     # Add MIDI data to array
