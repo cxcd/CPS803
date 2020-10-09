@@ -41,4 +41,4 @@ def make_piano_midi(notes, output_path):
 
 if __name__ == '__main__':
     #read_midi(midi_path=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'example.midi'))
-    make_piano_midi(test_notes, 'piano-C-chord.mid')
+    make_piano_midi(test_notes, 'output.midi')
