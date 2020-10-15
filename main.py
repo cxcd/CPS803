@@ -1,7 +1,7 @@
 import os
-from numba import jit
 import numpy as np
 import pretty_midi
+import util
 
 # Twinkle twinkle example midi
 twinkle_notes = np.array([
@@ -29,56 +29,10 @@ twinkle_notes = np.array([
         pretty_midi.Note(velocity=100, pitch=pretty_midi.note_name_to_number('G5'), start=1.5, end=2),
         ])
 
-def read_all_midi(dir_path):
-    data = []
-    if(not os.path.isdir('processed_midi_files')):
-        fileNum = 0
-        os.mkdir("processed_midi_files")
-        for root, dirs, files in os.walk(dir_path):
-            for file in files:
-                if file.endswith(".midi"):
-                    temp = midi_to_array(os.path.join(root, file))
-                    filename = '/processed_midi_files/midi_'+str(fileNum)+'.csv'
-                    f = open(filename, "x")
-                    for i in range(len(temp[0])):
-                        savetxt(filename, temp[:,i], delimiter=',')
-                    data.append(temp)#Could potentially output everything to one file
-                    fileNum += 1
-    else:
-        for file in os.listdir('processed_midi_files'):
-            data.append(loadtxt('midi.csv', delimiter=','))
-    return data
-
-
-# Read MIDI file into a 4D array where each element is [start, end, pitch, velocity]
-def midi_to_array(midi_path):
-    # Get MIDI data
-    data = pretty_midi.PrettyMIDI(midi_path).instruments[0].notes
-    # Init 4D array
-    array = np.zeros((len(data),4))
-    # Add MIDI data to array
-    for i in range(len(data)):
-        array[i] = ([data[i].start, data[i].end, data[i].pitch, data[i].velocity])
-    # Return array
-    return array
-
-# Output an array of notes to the desired path as MIDI
-def write_piano_midi(notes, write_path):
-    # Create the output structure
-    output = pretty_midi.PrettyMIDI()
-    # Create the instrument program and instrument
-    piano_program = pretty_midi.instrument_name_to_program('Acoustic Grand Piano')
-    piano = pretty_midi.Instrument(program=piano_program)
-    # Set the piano notes to the list of notes
-    piano.notes = notes
-    # Give the output our instrument
-    output.instruments.append(piano)
-    # Write the output
-    output.write(write_path)
-
 def main(read_path="", write_path="", notes=None):
-    # print(midi_to_array(read_path))
-    write_piano_midi(notes, write_path)
+    print(util.midi_to_array(read_path))
+    # util.write_piano_midi(notes, write_path)
+    # util.read_all_midi("maestro-v2.0.0")
 
 if __name__ == '__main__':
     main(read_path=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'example.midi'), notes=twinkle_notes, write_path='output.midi')
