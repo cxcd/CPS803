@@ -81,7 +81,7 @@ def write_processed_midi(dataset_path):
                 np.save(file_name, temp)
                 # Increment the file number
                 file_num += 1
-    print("Util: Finished saving midi as array files.")
+    print("Util: Finished saving MIDI to array.", file_num + 1, "total files.")
     return data
 
 # Read a processed midi file given its file number
