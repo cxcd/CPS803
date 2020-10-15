@@ -1,3 +1,4 @@
 .vscode
 maestro-v2.0.0
 __pycache__/
+.npy
