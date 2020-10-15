@@ -44,6 +44,7 @@ def write_processed_midi(dataset_path):
         for file in files:
             # For all midi files
             if file.endswith(".midi"):
+                print("Util: Saving midi_", fileNum, "...")
                 # Grab the midi and generate a file name
                 temp = midi_to_array(os.path.join(root, file))
                 filename = os.path.join(curr_dir, processed_dir + 'midi_'+str(fileNum))
@@ -51,6 +52,7 @@ def write_processed_midi(dataset_path):
                 np.save(filename, temp)
                 # Increment the file number
                 fileNum += 1
+    print("Util: Finished saving midi as array files.")
     return data
 
 def read_processed_midi(path):
