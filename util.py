@@ -2,7 +2,7 @@ import os
 import numpy as np
 import pretty_midi
 
-processed_dir = 'processed_midi_files/'
+processed_dir = 'processed_midi_files\\'
 
 # Read MIDI file into a 4D array where each element is [start, end, pitch, velocity]
 def midi_to_array(midi_path):
@@ -33,7 +33,7 @@ def write_piano_midi(notes, write_path):
 # Process all the midi into text data
 def write_processed_midi(dataset_path):
     data = []
-    fileNum = 0
+    file_num = 0
     curr_dir = os.path.dirname(__file__)
     # If the directory holding the processed files doesn't exist
     if(not os.path.exists(processed_dir)):
@@ -44,16 +44,18 @@ def write_processed_midi(dataset_path):
         for file in files:
             # For all midi files
             if file.endswith(".midi"):
-                print("Util: Saving midi_", fileNum, "...")
+                print("Util: Saving midi_", file_num, "...")
                 # Grab the midi and generate a file name
                 temp = midi_to_array(os.path.join(root, file))
-                filename = os.path.join(curr_dir, processed_dir + 'midi_'+str(fileNum))
+                file_name = os.path.join(curr_dir, processed_dir + 'midi_'+str(file_num))
                 # Save the file
-                np.save(filename, temp)
+                np.save(file_name, temp)
                 # Increment the file number
-                fileNum += 1
+                file_num += 1
     print("Util: Finished saving midi as array files.")
     return data
 
-def read_processed_midi(path):
-    return 0
+def read_processed_midi(file_num):
+    curr_dir = os.path.dirname(__file__)
+    path = os.path.join(curr_dir, processed_dir + 'midi_'+str(file_num) + ".npy")
+    return np.load(path)

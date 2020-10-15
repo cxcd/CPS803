@@ -30,9 +30,13 @@ twinkle_notes = np.array([
         ])
 
 def main(read_path="", write_path="", notes=None):
-    # print(util.midi_to_array(read_path))
-    # util.write_piano_midi(notes, write_path)
+
+    # RUN THIS FIRST TO GENERATE THE PROCESSED DATASET
     util.write_processed_midi("maestro-v2.0.0")
 
+    # print(util.midi_to_array(read_path))
+    # util.write_piano_midi(notes, write_path)
+    # print(util.read_processed_midi(0))
+
 if __name__ == '__main__':
-    main(read_path=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'example.midi'), notes=twinkle_notes, write_path='output.midi')
+    main(read_path=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'example2.midi'), notes=twinkle_notes, write_path='output.midi')
