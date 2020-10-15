@@ -2,26 +2,7 @@ import os
 import numpy as np
 import pretty_midi
 
-def read_all_midi(dir_path):
-    data = []
-    if(not os.path.exists('processed_midi_files')):
-        fileNum = 0
-        os.makedirs("processed_midi_files")
-        for root, dirs, files in os.walk(dir_path):
-            for file in files:
-                if file.endswith(".midi"):
-                    temp = midi_to_array(os.path.join(root, file))
-                    filename = 'midi_'+str(fileNum)+'.csv'
-                    with open(os.path.join('\\processed_midi_files', filename), 'a+') as f:
-                        for i in range(len(temp[0])):
-                            np.savetxt(filename, temp[:,i], delimiter=',')
-                    data.append(temp) #Could potentially output everything to one file
-                    fileNum += 1
-    else:
-        for file in os.listdir('processed_midi_files'):
-            data.append(np.loadtxt('midi.csv', delimiter=','))
-    return data
-
+processed_dir = 'processed_midi_files/'
 
 # Read MIDI file into a 4D array where each element is [start, end, pitch, velocity]
 def midi_to_array(midi_path):
@@ -48,3 +29,29 @@ def write_piano_midi(notes, write_path):
     output.instruments.append(piano)
     # Write the output
     output.write(write_path)
+
+# Process all the midi into text data
+def write_processed_midi(dataset_path):
+    data = []
+    fileNum = 0
+    curr_dir = os.path.dirname(__file__)
+    # If the directory holding the processed files doesn't exist
+    if(not os.path.exists(processed_dir)):
+        os.mkdir(processed_dir)
+    # Perform a walk in the dataset directory
+    for root, dirs, files in os.walk(dataset_path):
+        # For each file in the directory and subdirectories
+        for file in files:
+            # For all midi files
+            if file.endswith(".midi"):
+                # Grab the midi and generate a file name
+                temp = midi_to_array(os.path.join(root, file))
+                filename = os.path.join(curr_dir, processed_dir + 'midi_'+str(fileNum))
+                # Save the file
+                np.save(filename, temp)
+                # Increment the file number
+                fileNum += 1
+    return data
+
+def read_processed_midi(path):
+    return 0
