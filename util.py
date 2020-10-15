@@ -3,6 +3,7 @@ import numpy as np
 import pretty_midi
 
 processed_dir = 'processed_midi_files\\'
+max_files = 1281
 
 # Read MIDI file into a 4D array where each element is [start, end, pitch, velocity]
 def midi_to_array(midi_path):
@@ -55,7 +56,9 @@ def write_processed_midi(dataset_path):
     print("Util: Finished saving midi as array files.")
     return data
 
+# Read a processed midi file given its file number
 def read_processed_midi(file_num):
-    curr_dir = os.path.dirname(__file__)
-    path = os.path.join(curr_dir, processed_dir + 'midi_'+str(file_num) + ".npy")
-    return np.load(path)
+    if (file_num <= max_files and file_num >= 0):
+        curr_dir = os.path.dirname(__file__)
+        path = os.path.join(curr_dir, processed_dir + 'midi_'+str(file_num) + ".npy")
+        return np.load(path)
