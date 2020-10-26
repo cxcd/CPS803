@@ -4,6 +4,13 @@ import torch.nn as nn
 import torch.nn.functional as F
 import copy
 
+# TODO comment, use paper as reference
+
+'''
+Get the device which will run the model
+'''
+_device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 '''
 Clone a module n times
 '''
@@ -12,11 +19,56 @@ def clone(module, n):
 
 '''
 Narrow Multihead attention. 
-TODO implement from paper
 '''
 class SelfAttention(nn.Module):
-    def __init__(self):
+    def __init__(self, d_model, heads=8, dropout=0.1, relative_pos=True):
         super().__init__()
+        '''
+        if d_model % heads != 0:
+            raise AttentionError("Number of heads does not divide model dimension")
+        '''
+        self.d_model = d_model
+        self.heads = heads
+        s = d_model // heads
+        self.linears = torch.nn.ModuleList([nn.Linear(s, s, bias=False) for i in range(3)])
+        self.recombine_heads = nn.Linear(heads * s, d_model)
+        self.dropout = nn.Dropout(p=dropout)
+        self.max_length = 1024
+
+        self.relative_pos = relative_pos
+
+        self.Er = None # Default
+        if relative_pos:
+            self.Er = torch.rand([heads, self.max_length, s], device=_device)
+
+    # TODO implement from paper
+    def forward(self, x, mask):
+        '''
+        if self.relative_pos:
+            Er self.Er[:, embedding_start:, :].unsqueeze(0)
+            QEr = torch.matmul(queries, Er.transpose(-1,-2))
+            QEr = self.mask(QEr)
+            SRel = self.skew(QEr).contiguous().view(b * h, t , t)
+        else:
+            SRel = torch.zeros([b * h, t, t], device=_device)
+        '''
+        return
+
+    # Mask the upper triangle of the matrix
+    def mask(self, qe):
+        L = qe.shape[-1]
+        mask = torch.triu(torch.ones(L, L, device=_device), 1).flip(1)
+        return qe.masked_fill((mask == 1), 0)
+
+    # Skew QEr to correct logit positions
+    def skew(self, qe):
+        # Pad
+        padded_qe = F.pad(qe, [1,0])
+        # Reshape
+        s = padded_qe.shape
+        padded_qe = padded_qe.view(s[0], s[1], s[3], s[2])
+        # Slice
+        return padded_qe[:,:,1:,:]
 
 '''
 Embedding scaled by the sqrt of the models hidden state size
