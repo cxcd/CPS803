@@ -52,7 +52,7 @@ class SelfAttention(nn.Module):
         dot = F.softmax(dot, dim=2)
         # Remove NaN
         if self.mask == 'first':
-            dot = dot.cone()
+            dot = dot.clone()
             dot[:, :1 :] = 0.0
         # Apply self attention to values
         out = torch.bmm(dot, values).view(b, h, t, e)
