@@ -94,7 +94,7 @@ class TransformerBlock(nn.Module):
         # Complete
         return x
 
-class Transformer(nn.Module):
+class GenTransformer(nn.Module):
     """ Autoregressive transformer model """
     def __init__(self, emb, heads, depth, seq_length, n_tokens):
         super().__init__()
