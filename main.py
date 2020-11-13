@@ -20,7 +20,7 @@ def main(read_path="", write_path="output.midi"):
     # mid_data = util.read_processed_midi(0)
     # print(mid_data)
     # print("ROWS: ", mid_data.shape[0], "COLS: ", mid_data.shape[1])
-
+    """
     # Training the model
     generate.train(
         n_heads=8, 
@@ -37,9 +37,9 @@ def main(read_path="", write_path="output.midi"):
         data="data/books.txt", 
         output_path="models/genmodel.pt"
         )
-
+    """
     # Generate text
-    # gen("the ")
+    gen("the ")
 
 if __name__ == '__main__':
     main(read_path="maestro-v2.0.0")
