@@ -2,12 +2,7 @@ import math
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
-def d(tensor=None):
-    """ Return best available device """
-    if tensor is None:
-        return 'cuda' if torch.cuda.is_available() else 'cpu'
-    return 'cuda' if tensor.is_cuda else 'cpu'
+import util
 
 def mask(matrices, mask_val, mask_diagonal=True):
     """ Mask all values in place of given batch of matrices. Upper triangle becomes mask_val """
@@ -125,7 +120,7 @@ class GenTransformer(nn.Module):
         tokens = self.token_embedding(x)
         b, t, e = tokens.size()
         # Get positional embeddings of the batch
-        positions = self.pos_embedding(torch.arange(t, device=d()))[None, :, :].expand(b, t, e)
+        positions = self.pos_embedding(torch.arange(t, device=util.device()))[None, :, :].expand(b, t, e)
         # Unify embeddings
         x = self.unify_embeddings(torch.cat((tokens, positions), dim=2).view(-1, 2 * e)).view(b, t, e)
         # Run the batch through transformer blocks
