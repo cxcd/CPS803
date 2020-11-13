@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import pretty_midi
+import torch
 
 # Directory to load processed midi files
 processed_dir = 'processed_midi_files\\'
@@ -33,8 +34,22 @@ twinkle_notes = np.array([
         pretty_midi.Note(velocity=100, pitch=pretty_midi.note_name_to_number('G5'), start=1.5, end=2),
         ])
 
-# Read MIDI file into a 4D array where each element is [start, end, pitch, velocity]
+def device(tensor=None):
+    """
+    Get the available computaiton device
+    """
+    return 'cuda' if torch.cuda.is_available() else 'cpu'
+
+def here(file_name):
+    """
+    Get the given file name relative to the working directory
+    """
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), file_name))
+
 def midi_to_array(midi_path):
+    """
+    Read MIDI file into a 4D array where each element is [start, end, pitch, velocity]
+    """
     # Get MIDI data
     data = pretty_midi.PrettyMIDI(midi_path).instruments[0].notes
     # Init 4D array
@@ -45,8 +60,10 @@ def midi_to_array(midi_path):
     # Return array
     return array
 
-# Output an array of notes to the desired path as MIDI
 def write_piano_midi(notes, write_path):
+    """
+    Output an array of notes to the desired path as piano MIDI
+    """
     # Create the output structure
     output = pretty_midi.PrettyMIDI()
     # Create the instrument program and instrument
@@ -59,8 +76,10 @@ def write_piano_midi(notes, write_path):
     # Write the output
     output.write(write_path)
 
-# Process all the midi into text data
 def write_processed_midi(dataset_path):
+    """
+    Process all the midi into text data
+    """
     data = []
     file_num = 0
     curr_dir = os.path.dirname(__file__)
@@ -84,9 +103,25 @@ def write_processed_midi(dataset_path):
     print("Util: Finished saving MIDI to array.", file_num + 1, "total files.")
     return data
 
-# Read a processed midi file given its file number
 def read_processed_midi(file_num):
+    """
+    Read a processed midi file given its file number
+    """
     if (file_num <= max_files and file_num >= 0):
         curr_dir = os.path.dirname(__file__)
         path = os.path.join(curr_dir, processed_dir + 'midi_'+str(file_num) + ".npy")
         return np.load(path)
+
+def save_model(model, path):
+    """
+    Save the whole PyTorch model
+    """
+    torch.save(model, here(path))
+
+def load_model(path):
+    """
+    Load the whole PyTorch model
+    """
+    model = torch.load(here(path))
+    model.eval()
+    return model

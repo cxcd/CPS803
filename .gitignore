@@ -3,4 +3,5 @@ maestro-v2.0.0
 __pycache__/
 processed_midi_files/
 *.npy
-alice.txt
+*.txt
+*.zip
