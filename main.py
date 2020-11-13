@@ -22,10 +22,24 @@ def main(read_path="", write_path="output.midi"):
     # print("ROWS: ", mid_data.shape[0], "COLS: ", mid_data.shape[1])
 
     # Training the model
-    generate.train(data="data/the.txt", output_path="models/genmodel.pt")
+    generate.train(
+        n_heads=8, 
+        depth=4, 
+        seq_length=32, 
+        n_tokens=256, 
+        emb_size=128, 
+        n_batches=500, 
+        batch_size=64, 
+        test_every=50, 
+        lr=0.0001, 
+        warmup=100, 
+        seed=-1,
+        data="data/books.txt", 
+        output_path="models/genmodel.pt"
+        )
 
     # Generate text
-    gen("the ")
+    # gen("the ")
 
 if __name__ == '__main__':
     main(read_path="maestro-v2.0.0")

@@ -128,8 +128,8 @@ def train(n_heads=8, depth=4, seq_length=32, n_tokens=256, emb_size=128, n_batch
         # Validate every so often, compute compression then generate
         if i != 0 and (i % test_every == 0 or i == n_batches - 1):
             # TODO sort of arbitrary, make this rigorous
-            upto = data_test.size(0) if i == n_batches - 1 else 32
-            data_sub = data_test[:upto]
+            upto = data_valid.size(0) if i == n_batches - 1 else 32
+            data_sub = data_valid[:upto]
             # 
             with torch.no_grad():
                 bits, tot = 0.0, 0
@@ -168,10 +168,10 @@ def train(n_heads=8, depth=4, seq_length=32, n_tokens=256, emb_size=128, n_batch
                 # Print validation performance
                 bits_per_byte = abs(bits / data_sub.size(0))
                 print(f' epoch {i}: {bits_per_byte:.4} bits per byte')
-                print(" Loss:", loss.item())
+                print("Loss:", loss.item())
                 # Monitor progress by generating data based on the test data
-                seedfr = random.randint(0, data_test.size(0) - seq_length)
-                input = data_test[seedfr:seedfr + seq_length].to(torch.long)
+                seedfr = random.randint(0, data_valid.size(0) - seq_length)
+                input = data_valid[seedfr:seedfr + seq_length].to(torch.long)
                 gen(model, input)
 
     # Save the model when we're done training it

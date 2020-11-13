@@ -2,8 +2,6 @@
 maestro-v2.0.0
 __pycache__/
 processed_midi_files/
-data/
-models/
 *.npy
 *.txt
 *.zip
