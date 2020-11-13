@@ -17,22 +17,22 @@ def mask(matrices, mask_val, mask_diagonal=True):
 
 class SelfAttention(nn.Module):
     """ Multi-headed, scaled dot-product self attention """
-    def __init__(self, emb, heads=8, mask=False):
+    def __init__(self, emb, n_heads=8, mask=False):
         super().__init__()
         self.emb = emb
-        self.heads = heads
+        self.n_heads = n_heads
         self.mask = mask
         # q, k, v
         # Map query against set of keys to values
-        self.to_queries = nn.Linear(emb, emb * heads, bias=False)
-        self.to_keys = nn.Linear(emb, emb * heads, bias=False)
-        self.to_values = nn.Linear(emb, emb * heads, bias=False)
+        self.to_queries = nn.Linear(emb, emb * n_heads, bias=False)
+        self.to_keys = nn.Linear(emb, emb * n_heads, bias=False)
+        self.to_values = nn.Linear(emb, emb * n_heads, bias=False)
         # Unify output of heads to a single emb-vector
-        self.unify_heads = nn.Linear(heads * emb, emb)
+        self.unify_heads = nn.Linear(n_heads * emb, emb)
     
     def forward(self, x):
         b, t, e = x.size()
-        h = self.heads
+        h = self.n_heads
         # Init
         queries = self.to_queries(x).view(b, t, h, e)
         keys = self.to_keys(x).view(b, t, h, e)
@@ -96,7 +96,7 @@ class TransformerBlock(nn.Module):
 
 class GenTransformer(nn.Module):
     """ Autoregressive transformer model """
-    def __init__(self, emb, heads, depth, seq_length, n_tokens):
+    def __init__(self, emb, n_heads, depth, seq_length, n_tokens):
         super().__init__()
         # number of tokens
         self.n_tokens = n_tokens
@@ -112,7 +112,7 @@ class GenTransformer(nn.Module):
             t_blocks.append(
                 TransformerBlock(
                     emb=emb,
-                    heads=heads,
+                    n_heads=n_heads,
                     seq_length=seq_length,
                     mask=True
                 )
@@ -125,7 +125,7 @@ class GenTransformer(nn.Module):
         tokens = self.token_embedding(x)
         b, t, e = tokens.size()
         # Get positional embeddings of the batch
-        positions = self.pos_embedding(torch.arrange(t, device=d()))[None, :, :].expand(b, t, e)
+        positions = self.pos_embedding(torch.arange(t, device=d()))[None, :, :].expand(b, t, e)
         # Unify embeddings
         x = self.unify_embeddings(torch.cat((tokens, positions), dim=2).view(-1, 2 * e)).view(b, t, e)
         # Run the batch through transformer blocks
