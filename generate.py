@@ -1,3 +1,7 @@
+import os
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
 from torch import uint8
 import tf
 import math
@@ -49,10 +53,9 @@ def gen(model, input, size=100, temp=0.5):
     Generate data from the model
     """
     with torch.no_grad():
-        # Use cuda
-        if torch.cuda.is_available():
+        # Init input
+        if util.use_cuda():
             input = input.cuda()
-        #
         input = Variable(input)
         #  Print the input
         print('[', end='', flush=True)
@@ -94,6 +97,8 @@ def train(n_heads=8, depth=4, seq_length=32, n_tokens=256, emb_size=128, n_batch
                 seq_length=seq_length,
                 n_tokens=n_tokens
             )
+    if util.use_cuda():
+        model = model.cuda()
     # Optimizer
     opt = torch.optim.Adam(model.parameters(), lr)
     # Train over batches of random sequences
@@ -112,7 +117,7 @@ def train(n_heads=8, depth=4, seq_length=32, n_tokens=256, emb_size=128, n_batch
         source = torch.cat([s[None, :] for s in seqs_source], dim=0).to(torch.long)
         target = torch.cat([s[None, :] for s in seqs_target], dim=0).to(torch.long)
         # Get cuda
-        if torch.cuda.is_available():
+        if util.use_cuda():
             source, target = source.cuda(), target.cuda()
         source, target = Variable(source), Variable(target)
         # Initialize the output
@@ -132,7 +137,7 @@ def train(n_heads=8, depth=4, seq_length=32, n_tokens=256, emb_size=128, n_batch
             data_sub = data_valid[:upto]
             # 
             with torch.no_grad():
-                bits, tot = 0.0, 0
+                bits = 0.0
                 # When this buffer is full we run it through the model
                 batch = []
                 for current in range (data_sub.size(0)):
@@ -145,7 +150,7 @@ def train(n_heads=8, depth=4, seq_length=32, n_tokens=256, emb_size=128, n_batch
                         context = torch.cat([pad, context], dim=0)
                         assert context.size(0) == seq_length + 1
                     # Get cuda
-                    if torch.cuda.is_available():
+                    if util.use_cuda():
                         context = context.cuda()
                     # Fill the batch
                     batch.append(context[None, :])

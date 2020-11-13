@@ -1,4 +1,7 @@
 import os
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
 import numpy as np
 import pretty_midi
 import torch
@@ -39,6 +42,9 @@ def device(tensor=None):
     Get the available computaiton device
     """
     return 'cuda' if torch.cuda.is_available() else 'cpu'
+
+def use_cuda():
+    return torch.cuda.is_available()
 
 def here(file_name):
     """
