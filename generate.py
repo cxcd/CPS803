@@ -56,6 +56,7 @@ def gen(model, input, size=100, temp=0.5):
         # Init input
         if util.use_cuda():
             input = input.cuda()
+            model = model.cuda()
         input = Variable(input)
         #  Print the input
         print('[', end='', flush=True)
