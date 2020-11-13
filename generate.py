@@ -9,10 +9,12 @@ import torch.distributions as dist
 import random
 import numpy as np
 import tqdm, math
-
 import util
 
 def split_padded(a,n):
+    """
+    Pad splits to make them even
+    """
     padding = (-len(a))%n
     return np.split(np.concatenate((a,np.zeros(padding))),n)
 
@@ -31,22 +33,21 @@ def get_data(data_path):
 
 def sample(lnprobs, temperature=0.0):
     """
-    Sample an element from a categorical distribution
-    :param lnprobs: Outcome log-probabilities
-    :param temperature: Sampling temperature. 1.0 follows the given distribution,
-        0.0 returns the maximum probability element.
-    :return: The index of the sampled element.
+    Sample an element from the model. Temp of 1 follows the distribution, 0 follows the maximum probability.
     """
+    # Return max value if there is no temperature
     if temperature == 0.0:
         return lnprobs.argmax()
-
+    # Otherwise return the value according to the temperature
     p = F.softmax(lnprobs / temperature, dim=0)
     cd = dist.Categorical(p)
-
     return cd.sample()
 
 
 def gen(model, input, size=100, temp=0.5):
+    """
+    Generate data from the model
+    """
     with torch.no_grad():
         # Use cuda
         if torch.cuda.is_available():
@@ -56,7 +57,7 @@ def gen(model, input, size=100, temp=0.5):
         #  Print the input
         print('[', end='', flush=True)
         for i in input:
-            # TODO change this to appending to midi array
+            # TODO change this to appending to a midi array
             print(str(chr(i)), end='', flush=True)
         print(']', end='', flush=True)
         # Get generated data
@@ -72,6 +73,9 @@ def gen(model, input, size=100, temp=0.5):
 
 
 def train(n_heads=8, depth=4, seq_length=32, n_tokens=256, emb_size=128, n_batches=500, batch_size=64, test_every=50, lr=0.0001, warmup=100, seed=-1, data=None, output_path="genmodel.pt"):
+    """
+    Train the model and save it to output_path
+    """
     # Seed the network
     if (seed < 0):
         seed = random.randint(0, 1000000)
