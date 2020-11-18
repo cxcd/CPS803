@@ -11,7 +11,7 @@ import numpy as np
 import tqdm, math
 import util
 
-load_text = True
+load_text = False
 
 def split_padded(a,n):
     """
@@ -54,6 +54,7 @@ def gen(model, input, size=100, temp=0.5):
     Generate data from the model
     """
     with torch.no_grad():
+        pitches = []
         # Init input
         if util.use_cuda():
             input = input.cuda()
@@ -62,19 +63,24 @@ def gen(model, input, size=100, temp=0.5):
         #  Print the input
         print('[', end='', flush=True)
         for i in input:
-            # TODO change this to appending to a midi array
-            print(str(chr(i)), end='', flush=True)
+            print(i.item(), end=', ', flush=True)
         print(']', end='', flush=True)
         # Get generated data
+
         for i in range(size):
             output = model(input[None, :])
             c = sample(output[0, -1, :], temp)
-            # print(" SAMPLE: ", c)
-            print(str(chr(max(32, c))), end='', flush=True)
+            #print(" SAMPLE: ", c)
+            #print(str(chr(max(32, c))), end='', flush=True)
+            pitches.append(c.item())
             # Make next prediction informed by this prediction
             input = torch.cat([input[1:], c[None]], dim=0)
-        #
-        print()
+        print(pitches[:30])
+        util.write_piano_midi(util.pitches_to_midi(pitches), "output2.midi")
+        #print()
+        #print(pitches)
+
+
 
 
 def train(n_heads=8, depth=4, seq_length=32, n_tokens=256, emb_size=128, n_batches=500, batch_size=64, test_every=50, lr=0.0001, warmup=100, seed=-1, data=None, output_path="genmodel.pt"):
@@ -179,7 +185,7 @@ def train(n_heads=8, depth=4, seq_length=32, n_tokens=256, emb_size=128, n_batch
                 # Monitor progress by generating data based on the test data
                 seedfr = random.randint(0, data_valid.size(0) - seq_length)
                 input = data_valid[seedfr:seedfr + seq_length].to(torch.long)
-                gen(model, input)
+                #gen(model, input)
 
     # Save the model when we're done training it
     util.save_model(model, output_path)
