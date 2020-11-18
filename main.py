@@ -3,6 +3,16 @@ import generate
 import torch
 import numpy as np
 
+"""
+# Loads only the pitches from preprocessed data
+# If no parameters, load all the data
+data = util.load_all_predata_pitchonly()
+
+# Writes pitches to a midi file
+util.write_piano_midi(util.pitches_to_midi(some_array))
+
+"""
+
 def gen(input):
     print("Generated text: ")
     model = util.load_model("models/the_model.pt")
