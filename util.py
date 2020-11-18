@@ -135,6 +135,32 @@ def read_processed_midi(file_num):
         path = os.path.join(curr_dir, processed_dir + 'midi_'+str(file_num) + ".npy")
         return np.load(path)
 
+def load_all_predata(n=None):
+    data = []
+    # Set the range
+    if (n is None) or (n > max_files):
+        n = max_files
+    # Get the data
+    for i in range(n):
+        data.append(read_processed_midi(i))
+    data = np.array(data)
+    data.view(np.long)
+    return torch.from_numpy(data)
+
+def load_all_predata_pitchonly(n=None):
+    data = []
+    # Set the range
+    if (n is None) or (n > max_files):
+        n = max_files
+    # Get the data
+    for i in range(n):
+        arr = read_processed_midi(i)
+        for j in range(len(arr)):
+            data.append(arr[j][1])
+    data = np.array(data)
+    data.view(np.long)
+    return torch.from_numpy(data)
+
 def save_model(model, path):
     """
     Save the whole PyTorch model

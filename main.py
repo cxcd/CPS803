@@ -3,32 +3,6 @@ import generate
 import torch
 import numpy as np
 
-def load_all_predata(n=None):
-    data = []
-    # Set the range
-    if (n is None) or (n > util.max_files):
-        n = util.max_files
-    # Get the data
-    for i in range(n):
-        data.append(util.read_processed_midi(i))
-    data = np.array(data)
-    data.view(np.long)
-    return torch.from_numpy(data)
-
-def load_all_predata_pitchonly(n=None):
-    data = []
-    # Set the range
-    if (n is None) or (n > util.max_files):
-        n = util.max_files
-    # Get the data
-    for i in range(n):
-        arr = util.read_processed_midi(i)
-        for j in range(len(arr)):
-            data.append(arr[j][1])
-    data = np.array(data)
-    data.view(np.long)
-    return torch.from_numpy(data)
-
 def gen(input):
     print("Generated text: ")
     model = util.load_model("models/the_model.pt")
