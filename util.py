@@ -49,6 +49,17 @@ def here(file_name):
     """
     return os.path.abspath(os.path.join(os.path.dirname(__file__), file_name))
 
+def pitches_to_midi(pitches, duration=0.25, velocity=100):
+    """
+    Turn array of pitches into full midi data
+    """
+    notes = []
+    time_acc = 0
+    for i in range(len(pitches)):
+        notes.append( pretty_midi.Note(velocity, int(pitches[i]), time_acc, time_acc + duration))
+        time_acc += duration
+    return np.array(notes)
+
 def array_to_midi(input):
     """
     Convert array to the pretty_midi format

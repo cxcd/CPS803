@@ -3,6 +3,17 @@ import generate
 import torch
 import numpy as np
 
+def load_all_predata(range=None):
+    data = []
+    # Set the range
+    if (range is None) or (range > util.max_files):
+        range = util.max_files
+    # Get the data
+    for i in range(range):
+        data.append(util.read_processed_midi(i))
+    data.view(np.long)
+    return torch.from_numpy(data)
+
 def gen(input):
     print("Generated text: ")
     model = util.load_model("models/the_model.pt")
