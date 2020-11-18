@@ -1,7 +1,4 @@
 import os
-os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-
 import numpy as np
 import pretty_midi
 import torch
@@ -52,9 +49,18 @@ def here(file_name):
     """
     return os.path.abspath(os.path.join(os.path.dirname(__file__), file_name))
 
+def array_to_midi(input):
+    """
+    Convert array to the pretty_midi format
+    """
+    notes = []
+    for note in input:
+        notes.append( pretty_midi.Note(int(note[0]),int(note[1]),note[2],note[3]) )
+    return np.array(notes)
+
 def midi_to_array(midi_path):
     """
-    Read MIDI file into a 4D array where each element is [start, end, pitch, velocity]
+    Read MIDI file into a 4D array where each element is [velocity, pitch, start, end]
     """
     # Get MIDI data
     data = pretty_midi.PrettyMIDI(midi_path).instruments[0].notes
@@ -62,7 +68,7 @@ def midi_to_array(midi_path):
     array = np.zeros((len(data),4))
     # Add MIDI data to array
     for i in range(len(data)):
-        array[i] = ([data[i].start, data[i].end, data[i].pitch, data[i].velocity])
+        array[i] = ([data[i].velocity, data[i].pitch, data[i].start, data[i].end])
     # Return array
     return array
 

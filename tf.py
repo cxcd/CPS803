@@ -1,7 +1,3 @@
-import os
-os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-
 import math
 import torch
 import torch.nn as nn
@@ -9,13 +5,17 @@ import torch.nn.functional as F
 import util
 
 def mask(matrices, mask_val, mask_diagonal=True):
-    """ Mask all values in place of given batch of matrices. Upper triangle becomes mask_val """
+    """ 
+    Mask all values in place of given batch of matrices. Upper triangle becomes mask_val 
+    """
     b, h, w = matrices.size()
     indices = torch.triu_indices(h, w, offset=0 if mask_diagonal else 1)
     matrices[:, indices[0], indices[1]] = mask_val
 
 class SelfAttention(nn.Module):
-    """ Multi-headed, scaled dot-product self attention """
+    """ 
+    Multi-headed, scaled dot-product self attention 
+    """
     def __init__(self, emb, n_heads=8, mask=False):
         super().__init__()
         self.emb = emb
@@ -61,7 +61,9 @@ class SelfAttention(nn.Module):
         return self.unify_heads(out)
 
 class TransformerBlock(nn.Module):
-    """ Transformer block: attn + norm -> ff + norm """
+    """ 
+    Transformer block: attn + norm -> ff + norm 
+    """
     def __init__(self, emb, n_heads, mask, seq_length, ff_hidden_mult=4, dropout=0.0):
         super().__init__()
         # Self attention layer
@@ -94,7 +96,9 @@ class TransformerBlock(nn.Module):
         return x
 
 class GenTransformer(nn.Module):
-    """ Autoregressive transformer model """
+    """ 
+    Autoregressive transformer model 
+    """
     def __init__(self, emb, n_heads, depth, seq_length, n_tokens):
         super().__init__()
         # number of tokens

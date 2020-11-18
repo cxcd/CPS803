@@ -1,7 +1,3 @@
-import os
-os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-
 import util
 import generate
 import torch
@@ -9,7 +5,7 @@ import numpy as np
 
 def gen(input):
     print("Generated text: ")
-    model = util.load_model("models/genmodel.pt")
+    model = util.load_model("models/the_model.pt")
     data = np.array(list(input))
     data = data.view(np.uint8)
     data = torch.from_numpy(data).long()
@@ -43,7 +39,7 @@ def main(read_path="", write_path="output.midi"):
         )
     """
     # Generate text
-    gen("the ")
+    # gen("the ")
 
 if __name__ == '__main__':
     main(read_path="maestro-v2.0.0")
