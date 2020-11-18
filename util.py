@@ -56,7 +56,7 @@ def pitches_to_midi(pitches, duration=0.25, velocity=100):
     notes = []
     time_acc = 0
     for i in range(len(pitches)):
-        notes.append( pretty_midi.Note(velocity, int(pitches[i]), time_acc, time_acc + duration))
+        notes.append(pretty_midi.Note(velocity, int(pitches[i]), time_acc, time_acc + duration))
         time_acc += duration
     return np.array(notes)
 
@@ -66,7 +66,7 @@ def array_to_midi(input):
     """
     notes = []
     for note in input:
-        notes.append( pretty_midi.Note(int(note[0]),int(note[1]),note[2],note[3]) )
+        notes.append(pretty_midi.Note(int(note[0]), int(note[1]), note[2], note[3]))
     return np.array(notes)
 
 def midi_to_array(midi_path):
