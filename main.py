@@ -24,7 +24,7 @@ def gen(input):
 def main(read_path="", write_path="output.midi"):
 
     # RUN THIS FIRST TO GENERATE THE PROCESSED DATASET
-    util.write_processed_midi(read_path)
+    # util.write_processed_midi(read_path)
 
 
 
@@ -53,7 +53,7 @@ def main(read_path="", write_path="output.midi"):
     """
     # Generate text
     # gen("the ")
-    #print(load_all_predata_pitchonly(1))
+    # print(util.load_all_predata_pitchonly(2))
 
 
 if __name__ == '__main__':

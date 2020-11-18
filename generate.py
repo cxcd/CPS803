@@ -11,6 +11,8 @@ import numpy as np
 import tqdm, math
 import util
 
+load_text = True
+
 def split_padded(a,n):
     """
     Pad splits to make them even
@@ -21,11 +23,14 @@ def split_padded(a,n):
 def get_data(data_path):
     """ Incredibly naive approach to making data sets,
         only for proof of concept usage. """
-    with open(data_path, encoding="utf8") as f:
-        content = f.read()
-    # print (list(content))
-    data = np.array(list(content))
-    data = data.view(np.uint8)
+    if load_text:
+        with open(data_path, encoding="utf8") as f:
+            content = f.read()
+        # print (list(content))
+        data = np.array(list(content))
+        data = data.view(np.uint8)
+    else:
+        data = util.load_all_predata_pitchonly(10)
     # data = np.loadtxt(data_path, dtype=chr)
     train, half_data2 = split_padded(data, 2)
     valid, test = split_padded(half_data2, 2)
