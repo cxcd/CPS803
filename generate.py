@@ -11,8 +11,6 @@ import numpy as np
 import tqdm, math
 import util
 
-load_text = False
-
 def split_padded(a,n):
     """
     Pad splits to make them even
@@ -20,17 +18,10 @@ def split_padded(a,n):
     padding = (-len(a))%n
     return np.split(np.concatenate((a,np.zeros(padding))),n)
 
-def get_data(data_path):
+def get_data():
     """ Incredibly naive approach to making data sets,
         only for proof of concept usage. """
-    if load_text:
-        with open(data_path, encoding="utf8") as f:
-            content = f.read()
-        # print (list(content))
-        data = np.array(list(content))
-        data = data.view(np.uint8)
-    else:
-        data = util.load_all_predata_pitchonly(10)
+    data = util.load_all_predata_pitchonly(10)
     # data = np.loadtxt(data_path, dtype=chr)
     train, half_data2 = split_padded(data, 2)
     valid, test = split_padded(half_data2, 2)
@@ -80,10 +71,7 @@ def gen(model, input, size=100, temp=0.5):
         #print()
         #print(pitches)
 
-
-
-
-def train(n_heads=8, depth=4, seq_length=32, n_tokens=256, emb_size=128, n_batches=500, batch_size=64, test_every=50, lr=0.0001, warmup=100, seed=-1, data=None, output_path="genmodel.pt"):
+def train(n_heads=8, depth=4, seq_length=32, n_tokens=256, emb_size=128, n_batches=500, batch_size=64, test_every=50, lr=0.0001, warmup=100, seed=-1, data=None, data_sub=1000, output_path="genmodel.pt"):
     """
     Train the model and save it to output_path
     """
@@ -95,7 +83,6 @@ def train(n_heads=8, depth=4, seq_length=32, n_tokens=256, emb_size=128, n_batch
         torch.manual_seed(seed)
 
     # Load training data
-    if data == None: return
     data_train, data_valid, data_test = get_data(util.here(data))
     # Create the model
     model = tf.GenTransformer(
@@ -141,7 +128,7 @@ def train(n_heads=8, depth=4, seq_length=32, n_tokens=256, emb_size=128, n_batch
         # Validate every so often, compute compression then generate
         if i != 0 and (i % test_every == 0 or i == n_batches - 1):
             # TODO sort of arbitrary, make this rigorous
-            upto = data_valid.size(0) if i == n_batches - 1 else 32
+            upto = data_valid.size(0) if i == n_batches - 1 else data_sub
             data_sub = data_valid[:upto]
             # 
             with torch.no_grad():
@@ -184,7 +171,7 @@ def train(n_heads=8, depth=4, seq_length=32, n_tokens=256, emb_size=128, n_batch
                 print("Loss:", loss.item())
                 # Monitor progress by generating data based on the test data
                 seedfr = random.randint(0, data_valid.size(0) - seq_length)
-                input = data_valid[seedfr:seedfr + seq_length].to(torch.long)
+                # input = data_valid[seedfr:seedfr + seq_length].to(torch.long)
                 #gen(model, input)
 
     # Save the model when we're done training it
