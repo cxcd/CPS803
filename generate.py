@@ -45,7 +45,7 @@ def gen(model, input, size=100, temp=0.5):
     Generate data from the model
     """
     with torch.no_grad():
-        pitches = []
+        data = []
         # Init input
         if util.use_cuda():
             input = input.cuda()
@@ -63,11 +63,11 @@ def gen(model, input, size=100, temp=0.5):
             c = sample(output[0, -1, :], temp)
             #print(" SAMPLE: ", c)
             #print(str(chr(max(32, c))), end='', flush=True)
-            pitches.append(c.item())
+            data.append(c.item())
             # Make next prediction informed by this prediction
             input = torch.cat([input[1:], c[None]], dim=0)
-        print(pitches[:30])
-        util.write_piano_midi(util.pitches_to_midi(pitches), "output2.midi")
+        print(data[:30])
+        util.write_piano_midi(util.pitchesvelocity_to_midi(data), "output2.midi")
         #print()
         #print(pitches)
 

@@ -60,6 +60,17 @@ def pitches_to_midi(pitches, duration=0.25, velocity=100):
         time_acc += duration
     return np.array(notes)
 
+def pitchesvelocity_to_midi(data, duration=0.25, velocity=100):
+    """
+    Turn array of pitches into full midi data
+    """
+    notes = []
+    time_acc = 0
+    for i in range(len(data)):
+        notes.append(pretty_midi.Note(int(data[i][0]), int(data[i][1]), time_acc, time_acc + duration))
+        time_acc += duration
+    return np.array(notes)
+
 def array_to_midi(input):
     """
     Convert array to the pretty_midi format
