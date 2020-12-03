@@ -71,7 +71,7 @@ def gen(model, input, size=100, temp=0.5):
         #print()
         #print(pitches)
 
-def train(n_heads=8, depth=4, seq_length=32, n_tokens=256, emb_size=128, n_batches=500, batch_size=64, test_every=50, lr=0.0001, warmup=100, seed=-1, data=None, data_sub=1000, output_path="genmodel.pt"):
+def train(n_heads=8, depth=4, seq_length=32, n_tokens=256, emb_size=128, n_batches=500, batch_size=64, test_every=50, lr=0.0001, warmup=100, seed=-1, data_sub=1000, output_path="genmodel.pt"):
     """
     Train the model and save it to output_path
     """
@@ -83,7 +83,7 @@ def train(n_heads=8, depth=4, seq_length=32, n_tokens=256, emb_size=128, n_batch
         torch.manual_seed(seed)
 
     # Load training data
-    data_train, data_valid, data_test = get_data(util.here(data))
+    data_train, data_valid, data_test = get_data()
     # Create the model
     model = tf.GenTransformer(
                 emb=emb_size, 

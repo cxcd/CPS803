@@ -54,7 +54,6 @@ def main(read_path="", write_path="output.midi"):
         lr=0.000065, 
         warmup=100, 
         seed=-1,
-        data="yeet",
         output_path="models/pitch_model.pt"
         )
     """

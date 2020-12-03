@@ -1,3 +1,11 @@
+# PROF ADVICE
+"""
+- Final activation layer as sigmoid
+- MSE loss
+
+"""
+
+
 """
 Sequence-to-Sequence Modeling with nn.Transformer and TorchText
 ===============================================================
