@@ -2,6 +2,7 @@ import util
 import generate
 import torch
 import numpy as np
+import util
 
 """
 # Loads only the pitches from preprocessed data
@@ -41,7 +42,7 @@ def main(read_path="", write_path="output.midi"):
     # print("ROWS: ", mid_data.shape[0], "COLS: ", mid_data.shape[1])
     
     # Training the model
-    
+    """
     generate.train(
         n_heads=8, 
         depth=4, 
@@ -57,12 +58,14 @@ def main(read_path="", write_path="output.midi"):
         output_path="models/pitch_model.pt"
         )
     """
+    """
     # Generate text
 
     gen([61, 65, 61, 73, 65])
     #, 55, 59, 62 print(util.load_all_predata_pitchonly(2))
     """
-    print(get_pitches(900)[:10])
+    #print(get_pitches(900)[:10])
+    print(util.load_all_predata_pitchvelocityonly(1))
 
 
 if __name__ == '__main__':

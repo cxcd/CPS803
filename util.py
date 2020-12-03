@@ -159,7 +159,6 @@ def load_all_predata_pitchonly(n=None):
             data.append(arr[j][1])
     data = np.array(data)
     data.view(np.float)
-    print(data)
     return torch.from_numpy(data)
 
 def load_all_predata_pitchvelocityonly(n=None):
@@ -171,10 +170,9 @@ def load_all_predata_pitchvelocityonly(n=None):
     for i in range(n):
         arr = read_processed_midi(i)
         for j in range(len(arr)):
-            data.append(arr[j][0, 1])
+            data.append([arr[j][0], arr[j][1]])
     data = np.array(data)
     data.view(np.float)
-    print(data)
     return torch.from_numpy(data)
 
 def save_model(model, path):
