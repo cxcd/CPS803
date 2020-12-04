@@ -1,7 +1,5 @@
 from enum import Enum
 from operator import itemgetter
-import pretty_midi
-import numpy as np
 
 class EventType(Enum):
     """
