@@ -80,6 +80,11 @@ def main(read_path="", write_path="output.midi"):
         twinkle_event_indices.append(dataprocess.event_to_index(i))
     print("TWINKLE EVENTS:\n", twinkle_events)
     print("TWINKLE INDICES:\n", twinkle_event_indices)
+    twinkle_events2 = []
+    for i in twinkle_event_indices:
+        twinkle_events2.append(dataprocess.index_to_event(i))
+    print("TWINKLE EVENTS CONVERTED FROM INDICES:\n", twinkle_events2)
+
 
 
 

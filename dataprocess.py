@@ -30,6 +30,7 @@ class Event():
     def __repr__(self):
         return "(" + self.event_type.name + " : " + str(self.value) + ")\n"
 
+# TODO time shift not working
 def index_to_event(index):
     """
     Convert an index to its respective Event object in the format.
@@ -49,6 +50,7 @@ def index_to_event(index):
         # Return Set Velocity event
         return Event(EventType.SET_VELOCITY, (127 * (index - 357)) / 4)
 
+# TODO time shift not working
 def event_to_index(event):
     """
     Convert an Event object to its respective index in the format.
