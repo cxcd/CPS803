@@ -1,15 +1,6 @@
-"""
-Event and index format:
-0 - 127 = note on value = (index)
-128 - 256 = note off value = (index - 129) 
-257 - 357 = time shift value = (index - 157) as seconds
-358 - 362 = velocity value = (index - 357) * 25 as percent
-Notes are in range (0, 127) inclusive
-Time shift is in seconds, in increments of 10ms (10ms, 1000ms) inclusive
-Velocity is in range (0, 127) inclusive
-"""
-
 from enum import Enum
+import pretty_midi
+import numpy as np
 
 class EventType(Enum):
     """
@@ -23,6 +14,16 @@ class EventType(Enum):
 class Event():
     """
     Class to associate an event type to a value
+    event_type = The type of event this represents
+    value = the value with respect to the type
+    i.e. NOTE_ON, NOTE_OFF have pitch values (0, 127) inclusive
+         TIME_SHIFT has a time value in seconds (0.01, 1) inclusive
+         SET_VELOCITY has a velocity (0, 127) inclusive
+    The Index Format is as follows:
+    0 - 127 = NOTE_ON
+    128 - 256 = NOTE_OFF
+    257 - 357 = TIME_SHIFT
+    358 - 362 = SET_VELOCITY
     """
     def __init__(self, _type, _value):
         self.event_type = _type
@@ -61,6 +62,39 @@ def event_to_index(event):
     elif event.event_type is EventType.SET_VELOCITY:
         return int(((event.value * 4) / 127) + 357)
 
+def pretty_midi_to_event(midi_path):
+    """
+    Convert MIDI file to array of Event objects
+    """
+    # Get MIDI data
+    midi = pretty_midi.PrettyMIDI(midi_path).instruments[0].notes
+    # Init result
+    result = []
+    # Accumulators for computing start and end times
+    midi_acc = []
+    curr_time = 0
+    # For all the entries in the midi array
+    for i in midi:
+        # Add the current note
+        midi_acc.append(i)
+        # If the start time is greater than the current time
+        if i.start > curr_time:
+            # TODO Shift time
+            # TODO Accumulate shifted time
+            # Check if there are notes that are playing that need to end
+            notes_to_end = (x for x in midi_acc if curr_time >= x.end)
+            midi_acc[:] = (x for x in midi_acc if curr_time < x.end)
+            # For the finished notes
+            for j in notes_to_end:
+                # End the note
+                result.append(Event(EventType.NOTE_OFF, j.pitch))
+        # TODO if the velocity has changed, add a set velocity event
+        # Start the note
+        result.append(Event(EventType.NOTE_ON, i.pitch))
+    # TODO check if there are still notes in midi_acc
+    # TODO if there are, shift time to meet the ends and end them
+    # Return array
+    return result
 
 """
 ALGORITHM FOR CONVERTING PRETTY_MIDI TO MT INDICES
