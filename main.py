@@ -3,6 +3,9 @@ import generate
 import torch
 import numpy as np
 import util
+import dataprocess
+import os
+import pretty_midi
 
 """
 # Loads only the pitches from preprocessed data
@@ -13,6 +16,10 @@ data = util.load_all_predata_pitchonly()
 util.write_piano_midi(util.pitches_to_midi(some_array))
 
 """
+
+def get_processed_midi(file_num):
+    return dataprocess.pretty_midi_to_event(util.here("twinkle.midi"))
+
 
 def get_pitches(n):
     data = []
@@ -65,7 +72,13 @@ def main(read_path="", write_path="output.midi"):
     #, 55, 59, 62 print(util.load_all_predata_pitchonly(2))
     """
     #print(get_pitches(900)[:10])
-    print(util.load_all_predata_pitchvelocityonly(1))
+    # twinkle_midi = pretty_midi.PrettyMIDI(util.here("twinkle.midi")).instruments[0].notes
+    twinkle_array = util.midi_to_array(util.here("twinkle.midi"))
+    twinkle_events = dataprocess.midi_array_to_event(twinkle_array)
+    print("TWINKLE ARRAY:\n", twinkle_array)
+    print("TWINKLE EVENTS:\n", twinkle_events)
+
+
 
 
 if __name__ == '__main__':
