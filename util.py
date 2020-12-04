@@ -201,6 +201,9 @@ def load_model(path):
     model.eval()
     return model
 
+# A variable to determine the directory to store the models in
+models_path = 'models/'
+
 #Creates a directory at the specified path
 def create_dir(dir_path):
     if(not os.path.exists(dir_path)):
@@ -232,17 +235,16 @@ def get_latest_gen_num(model_num=None):
                     gen_num = temp_num
     return gen_num
 
-
-models_path = 'models/'
-#Creates a loss vs epoch plot, Creates a directory for the current model,
-#then saves the model, plot, loss, and params for the model
-#params - a dictionary
-#model_name must follow format trained_model_x.pt, where x is an integer 
+# Creates a loss vs epoch plot, Creates a directory for the current model,
+# then saves the model, plot, loss, and params for the model
+# params - An array containing all the params in order
+# losses - An array containing all the losses
+# num_epoch - Number of epochs
+# model_name must follow format trained_model_x.pt, where x is an integer 
 def save_on_train(model, losses, num_epochs, params, model_name=None):
     create_dir(models_path)
     model_num = 0
     if model_name==None:
-        #TODO implement it so it gets the latest number and uses that as tempNum
         model_num = get_latest_model_num()
         if(os.path.exists(models_path+'model_'+str(model_num))):
             model_num += 1
@@ -267,10 +269,10 @@ def save_on_train(model, losses, num_epochs, params, model_name=None):
     np.savetxt(dir_path+'params_'+str(model_num), params)
     torch.save(model, dir_path+model_name)
 
-#Saves the input and 
-#TODO create a directory inside model for saving outputs, midi output
-# Have to grab the latest gen number and save file 
-# Maybe store inputs in a different folder
+# Saves the input and midi_file to a folder
+# Will save to the latest model, and will create new gen file if no gen_num is specified
+# Specified gen_num will overwrite a file 
+# Specified model_num will be saved into that model
 def save_on_gen(input, midi_file, model_num=None, gen_num=None):
     if model_num==None:
         model_num = get_latest_model_num()
@@ -283,15 +285,17 @@ def save_on_gen(input, midi_file, model_num=None, gen_num=None):
     write_piano_midi(midi_file, dir_path+'gen_'+str(gen_num)+'.midi')
 
 
-#Returns empty list if it does not exist
-#Grabs the params of the specified model number
+# Returns empty list if it does not exist
+# Grabs the params of the specified model number
 def load_param(model_num):
     param_path = models_path+'model_'+model_num+'/params_'+model_num+'.npy'
     if(os.path.exists(param_path)):
-        return np.load(param_path)
+        return np.loadtxt(param_path)
     return []
 
-def load_model(model_num):
+# Returns empty list if it does not exist
+# Grabs the model of the specified model number
+def new_load_model(model_num):
     model_path = models_path+'model_'+model_num+'/trained_model_'+model_num+'.pt'
     if(os.path.exists(model_path)):
         return torch.load(model_path)
