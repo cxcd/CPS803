@@ -55,9 +55,9 @@ def event_to_index(event):
     Reverses all operations from index_to_event
     """
     if event.event_type is EventType.NOTE_ON:
-        return event.value
+        return int(event.value)
     elif event.event_type is EventType.NOTE_OFF:
-        return event.value + 128
+        return int(event.value + 128)
     elif event.event_type is EventType.TIME_SHIFT:
         return int((event.value * 100) + 157)
     elif event.event_type is EventType.SET_VELOCITY:
@@ -67,9 +67,7 @@ def midi_array_to_event(midi_as_array):
     """
     Take converted MIDI array and convert to array of Event objects
     """
-    # Get MIDI data
-    #midi = pretty_midi.PrettyMIDI(midi_path).instruments[0].notes
-    # Sort by start times TODO is this reduntant?
+    # Sort MIDI array
     midi = sorted(midi_as_array, key=itemgetter(2))
     # Init result
     result = []
