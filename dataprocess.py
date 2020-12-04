@@ -1,3 +1,4 @@
+import numpy as np
 from enum import Enum
 from operator import itemgetter
 
@@ -30,7 +31,6 @@ class Event():
     def __repr__(self):
         return "(" + self.event_type.name + " : " + str(self.value) + ")\n"
 
-# TODO time shift not working
 def index_to_event(index):
     """
     Convert an index to its respective Event object in the format.
@@ -45,12 +45,11 @@ def index_to_event(index):
         return Event(EventType.NOTE_OFF, index - 128)
     elif index in range(257, 358):
         # Return Time Shift event
-        return Event(EventType.TIME_SHIFT, (index - 157) / 100)
+        return Event(EventType.TIME_SHIFT, (index - 257) / 100)
     elif index in range(358, 362):
         # Return Set Velocity event
         return Event(EventType.SET_VELOCITY, (127 * (index - 357)) / 4)
 
-# TODO time shift not working
 def event_to_index(event):
     """
     Convert an Event object to its respective index in the format.
@@ -61,7 +60,7 @@ def event_to_index(event):
     elif event.event_type is EventType.NOTE_OFF:
         return int(event.value + 128)
     elif event.event_type is EventType.TIME_SHIFT:
-        return int((event.value * 100) + 157)
+        return int((event.value * 100) + 257)
     elif event.event_type is EventType.SET_VELOCITY:
         return int(((event.value * 4) / 127) + 357)
 
@@ -70,7 +69,14 @@ def midi_array_to_event(midi_as_array):
     Take converted MIDI array and convert to array of Event objects
     """
     # Sort MIDI array
-    midi = sorted(midi_as_array, key=itemgetter(2))
+    midi = np.array(sorted(midi_as_array, key=itemgetter(2)))
+    # Offset the start times for music that starts late
+    offset = midi[0][2] - 0.5
+    if offset < 0:
+        offset = 0
+    midi[:,2] -= offset
+    midi[:,3] -= offset
+    print("ARRAY:\n",midi)
     # Init result
     result = []
     # Accumulators for computing start and end times
@@ -97,17 +103,17 @@ def midi_array_to_event(midi_as_array):
                 # End the note
                 result.append(Event(EventType.NOTE_OFF, j[1]))
         # If the velocity has changed by a large enough amount, add a set velocity event
-        if (0 <= i[0] < 31.75 and not prev_vel_range is 1):
-            result.append(Event(EventType.SET_VELOCITY, i[0]))
+        if (0 <= i[0] < 31.75 and prev_vel_range != 1):
+            result.append(Event(EventType.SET_VELOCITY, 31.75))
             prev_vel_range = 1
-        elif (31.75 <= i[0] < 42.33 and not prev_vel_range is 2):
-            result.append(Event(EventType.SET_VELOCITY, i[0]))
+        elif (31.75 <= i[0] < 63.5 and prev_vel_range != 2):
+            result.append(Event(EventType.SET_VELOCITY, 42.33))
             prev_vel_range = 2
-        elif (42.33 <= i[0] < 63.5 and not prev_vel_range is 3):
-            result.append(Event(EventType.SET_VELOCITY, i[0]))
+        elif (63.5 <= i[0] < 95.25 and prev_vel_range != 3):
+            result.append(Event(EventType.SET_VELOCITY, 63.5))
             prev_vel_range = 3
-        elif (63.5 <= i[0] < 128 and not prev_vel_range is 4):
-            result.append(Event(EventType.SET_VELOCITY, i[0]))
+        elif (95.25 <= i[0] < 128 and prev_vel_range != 4):
+            result.append(Event(EventType.SET_VELOCITY, 127))
             prev_vel_range = 4
         # Start the note
         result.append(Event(EventType.NOTE_ON, i[1]))

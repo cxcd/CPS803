@@ -6,6 +6,7 @@ import util
 import dataprocess
 import os
 import pretty_midi
+from operator import itemgetter
 
 """
 # Loads only the pitches from preprocessed data
@@ -73,17 +74,23 @@ def main(read_path="", write_path="output.midi"):
     """
     #print(get_pitches(900)[:10])
     # twinkle_midi = pretty_midi.PrettyMIDI(util.here("twinkle.midi")).instruments[0].notes
-    twinkle_array = util.midi_to_array(util.here("twinkle.midi"))
-    twinkle_events = dataprocess.midi_array_to_event(twinkle_array)
-    twinkle_event_indices = []
-    for i in twinkle_events:
-        twinkle_event_indices.append(dataprocess.event_to_index(i))
-    print("TWINKLE EVENTS:\n", twinkle_events)
-    print("TWINKLE INDICES:\n", twinkle_event_indices)
-    twinkle_events2 = []
-    for i in twinkle_event_indices:
-        twinkle_events2.append(dataprocess.index_to_event(i))
-    print("TWINKLE EVENTS CONVERTED FROM INDICES:\n", twinkle_events2)
+
+    midi_array = util.read_processed_midi(0)
+    midi_sorted = sorted(midi_array, key=itemgetter(2))
+    midi_events = dataprocess.midi_array_to_event(midi_array)
+    midi_event_indices = []
+    for i in midi_events:
+        midi_event_indices.append(dataprocess.event_to_index(i))
+  
+    print("EVENTS:\n", midi_events[:15])
+    print("INDICES:\n", midi_event_indices[:15])
+    midi_events2 = []
+    for i in midi_event_indices:
+        midi_events2.append(dataprocess.index_to_event(i))
+    print("EVENTS CONVERTED FROM INDICES:\n", midi_events2[:15])
+
+    #e = dataprocess.Event(dataprocess.EventType.TIME_SHIFT, 0.01)
+    #print(dataprocess.event_to_index(e))
 
 
 
