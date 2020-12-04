@@ -2,6 +2,7 @@ import os
 import numpy as np
 import pretty_midi
 import torch
+import matplotlib.pyplot as plt
 
 # Directory to load processed midi files
 processed_dir = 'processed_midi_files\\'
@@ -199,3 +200,99 @@ def load_model(path):
     model = torch.load(here(path))
     model.eval()
     return model
+
+#Creates a directory at the specified path
+def create_dir(dir_path):
+    if(not os.path.exists(dir_path)):
+        os.mkdir(dir_path)
+
+#Gets the latest model number in the models directory
+def get_latest_model_num():
+    if(not os.path.exists(models_path)):
+        create_dir(models_path)
+    model_num = 0
+    for root, dirs, files, in os.walk(models_path):
+        for dir in dirs:
+            if dir.startswith('model_'):
+                temp_num = int(dir[len('model_'):])
+                if temp_num > model_num:
+                    model_num = temp_num
+    return model_num
+
+#Gets the latest gen_num, if model_num is not given the latest model_num will be given
+def get_latest_gen_num(model_num=None):
+    if model_num==None:
+        model_num = get_latest_model_num()
+    gen_num = 0
+    for root, dirs, files, in os.walk(models_path+'model_'+str(model_num)+'/gens/'):
+        for file in files:
+            if file.endswith('.midi'):
+                temp_num = int(file[len('gen_'):-len('.midi')])
+                if temp_num > gen_num:
+                    gen_num = temp_num
+    return gen_num
+
+
+models_path = 'models/'
+#Creates a loss vs epoch plot, Creates a directory for the current model,
+#then saves the model, plot, loss, and params for the model
+#params - a dictionary
+#model_name must follow format trained_model_x.pt, where x is an integer 
+def save_on_train(model, losses, num_epochs, params, model_name=None):
+    create_dir(models_path)
+    model_num = 0
+    if model_name==None:
+        #TODO implement it so it gets the latest number and uses that as tempNum
+        model_num = get_latest_model_num()
+        if(os.path.exists(models_path+'model_'+str(model_num))):
+            model_num += 1
+        model_name = 'trained_model_'+str(model_num)+'.pt'
+        dir_path = models_path+'model_'+str(model_num)+'/'
+    else:
+        if model_name[-3:] != ".pt" or model_name[:len("trained_model_")] != "trained_model_" or not model_name.replace("trained_model_","")[:-3].isdigit():
+            print("Error: model_name is incorrect and does not follow the format \"trained_model_x.pt\" where x is an integer")
+            return 
+        model_num = model_name.replace("trained_model_","")[:-len('.pt')]
+        dir_path = models_path+'model_'+model_num+'/'
+    create_dir(dir_path)
+    create_dir(dir_path+'gens/')
+    x_axis = np.arange(num_epochs)
+    fig, (loss_plot) = plt.subplots(1,1)
+    loss_plot.plot(x_axis, losses)
+    loss_plot.set_xlabel('epochs')
+    loss_plot.set_ylabel('loss')
+    loss_plot.legend()
+    fig.savefig(dir_path+'loss.png')
+    np.savetxt(dir_path+'losses_'+str(model_num), losses)
+    np.savetxt(dir_path+'params_'+str(model_num), params)
+    torch.save(model, dir_path+model_name)
+
+#Saves the input and 
+#TODO create a directory inside model for saving outputs, midi output
+# Have to grab the latest gen number and save file 
+# Maybe store inputs in a different folder
+def save_on_gen(input, midi_file, model_num=None, gen_num=None):
+    if model_num==None:
+        model_num = get_latest_model_num()
+    if gen_num==None:
+        gen_num = get_latest_gen_num(model_num)
+        if(os.path.exists(models_path+'model_'+str(model_num)+'/gens/gen_'+str(gen_num)+'_input.npy')):
+            gen_num += 1
+    dir_path = models_path+'model_'+str(model_num)+'/gens/'
+    np.savetxt(dir_path+'gen_'+str(gen_num)+'_input', input)
+    write_piano_midi(midi_file, dir_path+'gen_'+str(gen_num)+'.midi')
+
+
+#Returns empty list if it does not exist
+#Grabs the params of the specified model number
+def load_param(model_num):
+    param_path = models_path+'model_'+model_num+'/params_'+model_num+'.npy'
+    if(os.path.exists(param_path)):
+        return np.load(param_path)
+    return []
+
+def load_model(model_num):
+    model_path = models_path+'model_'+model_num+'/trained_model_'+model_num+'.pt'
+    if(os.path.exists(model_path)):
+        return torch.load(model_path)
+    return []
