@@ -75,7 +75,7 @@ def main(read_path="", write_path="output.midi"):
     # twinkle_midi = pretty_midi.PrettyMIDI(util.here("twinkle.midi")).instruments[0].notes
     twinkle_array = util.midi_to_array(util.here("twinkle.midi"))
     twinkle_events = dataprocess.midi_array_to_event(twinkle_array)
-    print("TWINKLE ARRAY:\n", twinkle_array)
+    #print("TWINKLE ARRAY:\n", twinkle_array)
     print("TWINKLE EVENTS:\n", twinkle_events)
 
 

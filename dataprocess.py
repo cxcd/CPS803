@@ -82,7 +82,7 @@ def midi_array_to_event(midi_as_array):
     for i in midi:
         # Add the current note
         midi_acc.append(i)
-        # If the start time is greater than the current time
+        # If the start time is greater than or equal to the current time
         if i[2] > curr_time:
             # Shift time, truncate to hundreths place
             shift_value = int((i[2] - curr_time) * 100) / 100
@@ -90,7 +90,7 @@ def midi_array_to_event(midi_as_array):
             # Accumulate shifted time
             curr_time += shift_value
             # Check if there are notes that are playing that need to end
-            notes_to_end = (x for x in midi_acc if curr_time >= x[3])
+            notes_to_end = [x for x in midi_acc if curr_time >= x[3]]
             midi_acc[:] = (x for x in midi_acc if curr_time < x[3])
             # For the finished notes
             for j in notes_to_end:
@@ -114,9 +114,11 @@ def midi_array_to_event(midi_as_array):
     # If there are still notes in midi_acc
     if midi_acc:
         for i in midi_acc:
-            # Shift time to meet the ends and end them
-            shift_value = int((i[3] - curr_time) * 100) / 100
-            result.append(Event(EventType.TIME_SHIFT, shift_value))
+            if i[3] > curr_time:
+                # Shift time to meet the ends and end them
+                shift_value = int((i[3] - curr_time) * 100) / 100
+                curr_time += shift_value
+                result.append(Event(EventType.TIME_SHIFT, shift_value))
             result.append(Event(EventType.NOTE_OFF, i[1]))
     # Return array
     return result
