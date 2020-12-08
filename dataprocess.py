@@ -91,6 +91,7 @@ def midi_array_to_event(midi_as_array):
 		# If the start time is greater than or equal to the current time
 		if i[2] > curr_time:
 			# Shift time, truncate to hundreths place
+			# Apply more shifts if the time exceeds the maximum possible shift
 			timeStep = 0.01
 			difference = i[2]-curr_time
 			if difference > 1:
@@ -105,8 +106,7 @@ def midi_array_to_event(midi_as_array):
 			else:
 				shift_value = int((i[2] - curr_time) * 100) / 100
 				result.append(Event(EventType.TIME_SHIFT, shift_value))
-			   # Accumulate shifted time
-
+			# Accumulate shifted time
 			curr_time += shift_value
 			# Check if there are notes that are playing that need to end
 			notes_to_end = [x for x in midi_acc if curr_time >= x[3]]
@@ -179,4 +179,3 @@ def event_to_midi_array(events):
 		midi_arr.append(pretty_midi.Note(velocity=int(curr_velocity), pitch=note, start=notes_on.get(note), end=curr_time))
 	
 	return midi_arr
-				
