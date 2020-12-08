@@ -1,4 +1,5 @@
 import numpy as np
+import pretty_midi
 from enum import Enum
 from operator import itemgetter
 
@@ -46,9 +47,9 @@ def index_to_event(index):
     elif index in range(257, 358):
         # Return Time Shift event
         return Event(EventType.TIME_SHIFT, (index - 257) / 100)
-    elif index in range(358, 362):
+    elif index in range(358, 378):
         # Return Set Velocity event
-        return Event(EventType.SET_VELOCITY, (127 * (index - 357)) / 4)
+        return Event(EventType.SET_VELOCITY, (127 * (index - 357)) / 20)
 
 def event_to_index(event):
     """
@@ -62,7 +63,7 @@ def event_to_index(event):
     elif event.event_type is EventType.TIME_SHIFT:
         return int((event.value * 100) + 257)
     elif event.event_type is EventType.SET_VELOCITY:
-        return int(((event.value * 4) / 127) + 357)
+        return int( ( ( (event.value * 20) / 127)+0.1) + 357)
 
 def midi_array_to_event(midi_as_array):
     """
@@ -90,9 +91,22 @@ def midi_array_to_event(midi_as_array):
         # If the start time is greater than or equal to the current time
         if i[2] > curr_time:
             # Shift time, truncate to hundreths place
-            shift_value = int((i[2] - curr_time) * 100) / 100
-            result.append(Event(EventType.TIME_SHIFT, shift_value))
-            # Accumulate shifted time
+            timeStep = 0.01
+            difference = i[2]-curr_time
+            if difference > 1:
+                tempVal = 0
+                for t in range(int((i[2]-curr_time)/timeStep)):
+                    tempVal += timeStep
+                    result.append(Event(EventType.TIME_SHIFT, timeStep))
+                shift_value = tempVal
+            elif 0.01 > difference>=0.007:
+                shift_value = 0.01
+                result.append(Event(EventType.TIME_SHIFT, shift_value))
+            else:
+                shift_value = int((i[2] - curr_time) * 100) / 100
+                result.append(Event(EventType.TIME_SHIFT, shift_value))
+               # Accumulate shifted time
+
             curr_time += shift_value
             # Check if there are notes that are playing that need to end
             notes_to_end = [x for x in midi_acc if curr_time >= x[3]]
@@ -102,18 +116,14 @@ def midi_array_to_event(midi_as_array):
                 # End the note
                 result.append(Event(EventType.NOTE_OFF, j[1]))
         # If the velocity has changed by a large enough amount, add a set velocity event
-        if (0 <= i[0] < 31.75 and prev_vel_range != 1):
-            result.append(Event(EventType.SET_VELOCITY, 31.75))
-            prev_vel_range = 1
-        elif (31.75 <= i[0] < 63.5 and prev_vel_range != 2):
-            result.append(Event(EventType.SET_VELOCITY, 42.33))
-            prev_vel_range = 2
-        elif (63.5 <= i[0] < 95.25 and prev_vel_range != 3):
-            result.append(Event(EventType.SET_VELOCITY, 63.5))
-            prev_vel_range = 3
-        elif (95.25 <= i[0] < 128 and prev_vel_range != 4):
-            result.append(Event(EventType.SET_VELOCITY, 127))
-            prev_vel_range = 4
+        tempVelocity = i[0]
+        bin_size = (127/20)
+        for vel in range(20):
+            if tempVelocity < (vel+1)*bin_size:
+                if prev_vel_range != vel:
+                    result.append(Event(EventType.SET_VELOCITY, (vel+1)*bin_size ))
+                    prev_vel_range = vel
+                break
         # Start the note
         result.append(Event(EventType.NOTE_ON, i[1]))
     # If there are still notes in midi_acc
@@ -143,6 +153,8 @@ def event_to_midi_array(events):
     notes_on = {}
 
     for event in events:
+        if event is None:
+            continue
         if event.event_type is EventType.NOTE_ON:
             # If the note is present in the dictionary it will be added to the midi_arr
             if notes_on.get(event.value) is not None:
