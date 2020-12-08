@@ -146,13 +146,13 @@ def event_to_midi_array(events):
         if event.event_type is EventType.NOTE_ON:
             # If the note is present in the dictionary it will be added to the midi_arr
             if notes_on.get(event.value) is not None:
-                midi_arr.append(pretty_midi.Note(velocity=curr_velocity, pitch=event.value, start=notes_on.get(event.value), end=curr_time))
+                midi_arr.append(pretty_midi.Note(velocity=int(curr_velocity), pitch=event.value, start=notes_on.get(event.value), end=curr_time))
             # Regardless we add/update the note into the dictionary
             notes_on.update({event.value:curr_time})
         elif event.event_type is EventType.NOTE_OFF:
             #Ensures the note has been turned off previously and sends a warning otherwise
             if notes_on.get(event.value) is not None:
-                midi_arr.append(pretty_midi.Note(velocity=curr_velocity, pitch=event.value, start=notes_on.get(event.value), end=curr_time))
+                midi_arr.append(pretty_midi.Note(velocity=int(curr_velocity), pitch=event.value, start=notes_on.get(event.value), end=curr_time))
                 notes_on.pop(event.value)
             else:
                 print("Error: Note "+str(event.value)+" is trying to be turned off when it has never been turned on")
@@ -164,7 +164,7 @@ def event_to_midi_array(events):
     
     # If any of the notes in the dictionary haven't been turned off yet, we end them at the curr_time 
     for note in notes_on.keys():
-        midi_arr.append(pretty_midi.Note(velocity=curr_velocity, pitch=note, start=notes_on.get(note), end=curr_time))
+        midi_arr.append(pretty_midi.Note(velocity=int(curr_velocity), pitch=note, start=notes_on.get(note), end=curr_time))
     
     return midi_arr
                 
