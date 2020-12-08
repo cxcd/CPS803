@@ -7,6 +7,6 @@ Our final project for the Ryerson University course CPS803 Machine Learning, in 
 <a id="1">[1]</a> 
 Huang, C. A., Vaswani, A., Uszkoreit, J., Shazeer, N., Simon, I., Hawthorne, C., Dai, A. M., Hoffman, M. D., Dinculescu, M., & Eck, D. (2018). Music transformer: Generating music with long-term structure. CoRR. http://arxiv.org/abs/1809.04281
 
-<a id="2">[1]</a> 
+<a id="2">[2]</a> 
 P. Bloem, former, (2019), GitHub repository, https://github.com/pbloem/former
 
