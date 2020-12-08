@@ -127,3 +127,44 @@ def midi_array_to_event(midi_as_array):
             result.append(Event(EventType.NOTE_OFF, i[1]))
     # Return array
     return result
+
+
+def event_to_midi_array(events):
+    """
+    Take array of Event objects and convert to midi array
+    """
+    # Holds the output midi array
+    midi_arr = []
+    # Holds the current velocity
+    curr_velocity = 100
+    # Holds the current time
+    curr_time = 0
+    # notes_on, contains notes that are currently on, {note:start_time}
+    notes_on = {}
+
+    for event in events:
+        if event.event_type is EventType.NOTE_ON:
+            # If the note is present in the dictionary it will be added to the midi_arr
+            if notes_on.get(event.value) is not None:
+                midi_arr.append(pretty_midi.Note(velocity=curr_velocity, pitch=event.value, start=notes_on.get(event.value), end=curr_time))
+            # Regardless we add/update the note into the dictionary
+            notes_on.update({event.value:curr_time})
+        elif event.event_type is EventType.NOTE_OFF:
+            #Ensures the note has been turned off previously and sends a warning otherwise
+            if notes_on.get(event.value) is not None:
+                midi_arr.append(pretty_midi.Note(velocity=curr_velocity, pitch=event.value, start=notes_on.get(event.value), end=curr_time))
+                notes_on.pop(event.value)
+            else:
+                print("Error: Note "+str(event.value)+" is trying to be turned off when it has never been turned on")
+        elif event.event_type is EventType.TIME_SHIFT:
+            #Increments curr_time
+            curr_time += event.value
+        elif event.event_type is EventType.SET_VELOCITY:
+            curr_velocity = event.value
+    
+    # If any of the notes in the dictionary haven't been turned off yet, we end them at the curr_time 
+    for note in notes_on.keys():
+        midi_arr.append(pretty_midi.Note(velocity=curr_velocity, pitch=note, start=notes_on.get(note), end=curr_time))
+    
+    return midi_arr
+                
