@@ -77,20 +77,20 @@ def midi_array_to_event(midi_as_array):
 	# Init result
 	result = []
 	# Accumulators for computing start and end times
-	midi_acc = []
+	active_notes = []
 	curr_time = 0
 	# For comparing velocities
 	prev_vel_range = 0
 	# For all the entries in the midi array
 	for i in midi:
 		# Add the current note
-		midi_acc.append(i)
+		active_notes.append(i)
 		# Check the difference between the current time and the start of this note
 		time_diff = i[2] - curr_time
 		# If the difference is greater than 1, we need many time shifts
 		if time_diff > 1:
-			n = int(time_diff)
-			r = int((time_diff - n) * 100) / 100
+			n = int(time_diff) # Number of full shifts
+			r = int((time_diff - n) * 100) / 100 # Remainder shift value
 			for t in range(n):
 				result.append(Event(EventType.TIME_SHIFT, 1))
 			result.append(Event(EventType.TIME_SHIFT, r))
@@ -108,8 +108,8 @@ def midi_array_to_event(midi_as_array):
 		curr_time += shift_value
 
 		# Check if there are notes that are playing that need to end
-		notes_to_end = [x for x in midi_acc if curr_time >= x[3]]
-		midi_acc[:] = (x for x in midi_acc if curr_time < x[3])
+		notes_to_end = [x for x in active_notes if curr_time >= x[3]]
+		active_notes[:] = (x for x in active_notes if curr_time < x[3])
 		# For the finished notes
 		for j in notes_to_end:
 			# End the note
@@ -129,8 +129,8 @@ def midi_array_to_event(midi_as_array):
 		result.append(Event(EventType.NOTE_ON, i[1]))
 
 	# If there are still notes in midi_acc
-	if midi_acc:
-		for i in midi_acc:
+	if active_notes:
+		for i in active_notes:
 			if i[3] > curr_time:
 				# Shift time to meet the ends and end them
 				shift_value = int((i[3] - curr_time) * 100) / 100
