@@ -78,11 +78,11 @@ def main(read_path="", write_path="output.midi"):
 	
 	# Get midi
 	# midi_array = util.read_processed_midi(1) # 8 is a good test case (16 errors)
-	midi_array = util.midi_to_array(util.here("testmidi/test.midi"))
+	midi_array = util.midi_to_array(util.here("testmidi/timetest.midi"))
 	#print("ORIGINAL LENGTH", len(midi_array))
 	#print("ORIGINAL ARRAY", midi_array)
 	# Convert to events
-	midi_events = dataprocess.midi_array_to_event(midi_array)
+	midi_events = dataprocess.midi_array_to_event2(midi_array)
 	#print("ORIGINAL EVENTS", midi_events)
 	# Convert to indices
 	midi_event_indices = []
@@ -95,7 +95,7 @@ def main(read_path="", write_path="output.midi"):
 	# print("NEW EVENTS", midi_events2)
 	# Convert back to midi
 	midi_array2 = dataprocess.event_to_midi_array(midi_events2)
-	# print("NEW ARRAY", midi_array2)
+	#print("NEW ARRAY", midi_array2)
 	#print("NEW LENGTH", len(midi_array2))
 	# Save
 	util.write_piano_midi(midi_array2, util.here("output.midi"))
