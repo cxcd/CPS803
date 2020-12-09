@@ -176,17 +176,16 @@ def event_to_midi_array(events):
 	total_errors = 0
 
 	for index, event in enumerate(events):
-		if event is None:
-			continue
 		if event.event_type is EventType.NOTE_ON:
 			# If the note is present in the dictionary it will be added to the midi_arr
 			if notes_on.get(event.value) is not None:
 				midi_arr.append(pretty_midi.Note(velocity=int(curr_velocity), pitch=event.value, start=notes_on.get(event.value), end=curr_time))
 			# Regardless we add/update the note into the dictionary
-			notes_on.update({event.value:curr_time})
+			notes_on.update({event.value : curr_time})
 		elif event.event_type is EventType.NOTE_OFF:
 			#Ensures the note has been turned off previously and sends a warning otherwise
 			if notes_on.get(event.value) is not None:
+				print("VEL:", curr_velocity)
 				midi_arr.append(pretty_midi.Note(velocity=int(curr_velocity), pitch=event.value, start=notes_on.get(event.value), end=curr_time))
 				notes_on.pop(event.value)
 			else:
@@ -197,10 +196,57 @@ def event_to_midi_array(events):
 			curr_time += event.value
 		elif event.event_type is EventType.SET_VELOCITY:
 			curr_velocity = event.value
-	
+		else:
+			continue
 	# If any of the notes in the dictionary haven't been turned off yet, we end them at the curr_time 
 	for note in notes_on.keys():
 		midi_arr.append(pretty_midi.Note(velocity=int(curr_velocity), pitch=note, start=notes_on.get(note), end=curr_time))
 	
 	print("TOTAL ERRORS:", total_errors)
 	return midi_arr
+
+def event_to_midi_array2(events):
+	"""
+	Take array of Event objects and convert to midi array
+	"""
+	# Holds the output midi array
+	result = []
+	# Holds the current velocity
+	curr_velocity = 100
+	# Holds the current time
+	curr_time = 0
+	# notes_on, contains notes that are currently on, {note:start_time}
+	notes_on = {}
+	# Debugging
+	total_errors = 0
+
+	for index, event in enumerate(events):
+		# If this event changes the velocity
+		if event.event_type is EventType.SET_VELOCITY:
+			# Set the velocity
+			curr_velocity = event.value
+		# IF this is a time shifting event
+		elif event.event_type is EventType.TIME_SHIFT:
+			# Shift the time by the given value
+			curr_time += event.value
+		# If this event starts a note
+		elif event.event_type is EventType.NOTE_ON:
+			# Accumulate this note and await its end time
+			notes_on[event.value] = [curr_velocity, curr_time]
+		# If this event ends a note
+		elif event.event_type is EventType.NOTE_OFF:
+			# Verify that this note can be ended
+			if notes_on.get(event.value) is not None:
+				# Add it to the result
+				vel = notes_on[event.value][0]
+				start_time = notes_on[event.value][1]
+				result.append(pretty_midi.Note(velocity=int(vel), pitch=int(event.value), start=start_time, end=curr_time))
+				# Remove it from the dictionary
+				del notes_on[event.value]
+			# If it cannot be ended, show a warning
+			else:
+				print("Error: Note", str(event.value), "is trying to be turned off when it has never been turned on [", index, "]")
+				total_errors += 1
+	print("TOTAL ERRORS:", total_errors)
+	# Return the completed array
+	return result
