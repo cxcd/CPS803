@@ -92,17 +92,20 @@ def midi_array_to_event(midi_as_array):
 		if i[2] > curr_time:
 			# Shift time, truncate to hundreths place
 			# Apply more shifts if the time exceeds the maximum possible shift
-			timeStep = 0.01
-			difference = i[2]-curr_time
+			time_step = 0.01
+			difference = i[2] - curr_time
+			# If the difference is greater than 1, we need many time shifts
 			if difference > 1:
-				tempVal = 0
-				for t in range(int((i[2]-curr_time)/timeStep)):
-					tempVal += timeStep
-					result.append(Event(EventType.TIME_SHIFT, timeStep))
-				shift_value = tempVal
-			elif 0.01 > difference>=0.007:
+				temp_val = 0
+				for t in range(int((i[2]-curr_time)/time_step)):
+					temp_val += time_step
+					result.append(Event(EventType.TIME_SHIFT, time_step))
+				shift_value = temp_val
+			# If the difference is less than the greatest possible time step, shift by the time step
+			elif 0.01 > difference >= 0.007:
 				shift_value = 0.01
 				result.append(Event(EventType.TIME_SHIFT, shift_value))
+			# Otherwise shift normally
 			else:
 				shift_value = int((i[2] - curr_time) * 100) / 100
 				result.append(Event(EventType.TIME_SHIFT, shift_value))
@@ -126,6 +129,7 @@ def midi_array_to_event(midi_as_array):
 				break
 		# Start the note
 		result.append(Event(EventType.NOTE_ON, i[1]))
+		
 	# If there are still notes in midi_acc
 	if midi_acc:
 		for i in midi_acc:
