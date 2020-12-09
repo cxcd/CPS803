@@ -103,7 +103,8 @@ def midi_array_to_event(midi_as_array):
 		# Otherwise shift normally
 		else:
 			shift_value = int((i[2] - curr_time) * 100) / 100
-			result.append(Event(EventType.TIME_SHIFT, shift_value))
+			if shift_value > 0:
+				result.append(Event(EventType.TIME_SHIFT, shift_value))
 		# Accumulate shifted time
 		curr_time += shift_value
 
@@ -132,11 +133,30 @@ def midi_array_to_event(midi_as_array):
 	if active_notes:
 		for i in active_notes:
 			if i[3] > curr_time:
-				# Shift time to meet the ends and end them
-				shift_value = int((i[3] - curr_time) * 100) / 100
+				# Check the difference between the current time and the end of this note
+				time_diff = i[3] - curr_time
+				# If the difference is greater than 1, we need many time shifts
+				if time_diff > 1:
+					n = int(time_diff) # Number of full shifts
+					r = int((time_diff - n) * 100) / 100 # Remainder shift value
+					for t in range(n):
+						result.append(Event(EventType.TIME_SHIFT, 1))
+					result.append(Event(EventType.TIME_SHIFT, r))
+					shift_value = n + r
+				# If the difference is less than the greatest possible time step, shift by the time step
+				# If its too low, consider it a simultaneous note
+				elif time_step > time_diff >= 0.007:
+					shift_value = time_step
+					result.append(Event(EventType.TIME_SHIFT, shift_value))
+				# Otherwise shift normally
+				else:
+					shift_value = int((i[3] - curr_time) * 100) / 100
+					if shift_value > 0:
+						result.append(Event(EventType.TIME_SHIFT, shift_value))
+				# Accumulate shifted time
 				curr_time += shift_value
-				result.append(Event(EventType.TIME_SHIFT, shift_value))
 			result.append(Event(EventType.NOTE_OFF, i[1]))
+	
 	# Return array
 	return result
 
@@ -170,7 +190,7 @@ def event_to_midi_array(events):
 				midi_arr.append(pretty_midi.Note(velocity=int(curr_velocity), pitch=event.value, start=notes_on.get(event.value), end=curr_time))
 				notes_on.pop(event.value)
 			else:
-				print("Error: Note "+str(event.value)+" is trying to be turned off when it has never been turned on [", index, "]")
+				print("Error: Note", str(event.value), "is trying to be turned off when it has never been turned on [", index, "]")
 				total_errors += 1
 		elif event.event_type is EventType.TIME_SHIFT:
 			#Increments curr_time
