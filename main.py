@@ -92,10 +92,10 @@ def main(read_path="", write_path="output.midi"):
 	midi_events2 = []
 	for i in midi_event_indices:
 		midi_events2.append(dataprocess.index_to_event(i))
-	#print("NEW EVENTS", midi_events2)
+	# print("NEW EVENTS", midi_events2)
 	# Convert back to midi
 	midi_array2 = dataprocess.event_to_midi_array(midi_events2)
-	#print("NEW ARRAY", midi_array2)
+	# print("NEW ARRAY", midi_array2)
 	#print("NEW LENGTH", len(midi_array2))
 	# Save
 	util.write_piano_midi(midi_array2, util.here("output.midi"))

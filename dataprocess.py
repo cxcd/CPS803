@@ -1,4 +1,3 @@
-import numpy as np
 import pretty_midi
 from enum import Enum
 from operator import itemgetter
@@ -68,12 +67,33 @@ def event_to_index(event):
 	elif event.event_type is EventType.SET_VELOCITY:
 		return int( ( ( (event.value * 20) / 127)+0.1) + 357)
 
+
+def get_shift_value(time_diff):
+	shift_values = []
+	shift_sum = 0
+	# If the difference is greater than 1, we need many time shifts
+	if time_diff > 1:
+		n = int(time_diff) # Number of full shifts
+		r = int((time_diff - n) * 100) / 100 # Remainder shift value
+		for t in range(n):
+			shift_values.append(1)
+		shift_values.append(r)
+		shift_sum = n + r
+	# If the difference is less than the greatest possible time step, shift by the time step
+	# If its too low, consider it a simultaneous note
+	elif time_step > time_diff >= 0.007:
+		shift_sum = time_step
+	# Otherwise shift normally
+	else:
+		shift_sum = int((time_diff) * 100) / 100
+	return shift_values, shift_sum
+
 def midi_array_to_event(midi_as_array):
 	"""
 	Take converted MIDI array and convert to array of Event objects
 	"""
 	# Sort MIDI array
-	midi = np.array(sorted(midi_as_array, key=itemgetter(2)))
+	midi = sorted(midi_as_array, key=itemgetter(2))
 	# Init result
 	result = []
 	# Accumulators for computing start and end times
@@ -85,28 +105,18 @@ def midi_array_to_event(midi_as_array):
 	for i in midi:
 		# Add the current note
 		active_notes.append(i)
-		# Check the difference between the current time and the start of this note
-		time_diff = i[2] - curr_time
-		# If the difference is greater than 1, we need many time shifts
-		if time_diff > 1:
-			n = int(time_diff) # Number of full shifts
-			r = int((time_diff - n) * 100) / 100 # Remainder shift value
-			for t in range(n):
-				result.append(Event(EventType.TIME_SHIFT, 1))
-			result.append(Event(EventType.TIME_SHIFT, r))
-			shift_value = n + r
-		# If the difference is less than the greatest possible time step, shift by the time step
-		# If its too low, consider it a simultaneous note
-		elif time_step > time_diff >= 0.007:
-			shift_value = time_step
-			result.append(Event(EventType.TIME_SHIFT, shift_value))
-		# Otherwise shift normally
+
+		# Get time shift values 
+		shift_values, shift_sum = get_shift_value(i[2] - curr_time)
+		# Apply time shift to the next start note
+		if shift_values:
+			for s in shift_values:
+				if s > 0:
+					result.append(Event(EventType.TIME_SHIFT, s))
 		else:
-			shift_value = int((i[2] - curr_time) * 100) / 100
-			if shift_value > 0:
-				result.append(Event(EventType.TIME_SHIFT, shift_value))
-		# Accumulate shifted time
-		curr_time += shift_value
+			result.append(Event(EventType.TIME_SHIFT, shift_sum))
+		# Update time
+		curr_time += shift_sum
 
 		# Check if there are notes that are playing that need to end
 		notes_to_end = [x for x in active_notes if curr_time >= x[3]]
@@ -133,79 +143,23 @@ def midi_array_to_event(midi_as_array):
 	if active_notes:
 		for i in active_notes:
 			if i[3] > curr_time:
-				# Check the difference between the current time and the end of this note
-				time_diff = i[3] - curr_time
-				# If the difference is greater than 1, we need many time shifts
-				if time_diff > 1:
-					n = int(time_diff) # Number of full shifts
-					r = int((time_diff - n) * 100) / 100 # Remainder shift value
-					for t in range(n):
-						result.append(Event(EventType.TIME_SHIFT, 1))
-					result.append(Event(EventType.TIME_SHIFT, r))
-					shift_value = n + r
-				# If the difference is less than the greatest possible time step, shift by the time step
-				# If its too low, consider it a simultaneous note
-				elif time_step > time_diff >= 0.007:
-					shift_value = time_step
-					result.append(Event(EventType.TIME_SHIFT, shift_value))
-				# Otherwise shift normally
+				# Apply time shift
+				shift_values, shift_sum = get_shift_value(i[3] - curr_time)
+				if shift_values:
+					for s in shift_values:
+						if s > 0:
+							result.append(Event(EventType.TIME_SHIFT, s))
 				else:
-					shift_value = int((i[3] - curr_time) * 100) / 100
-					if shift_value > 0:
-						result.append(Event(EventType.TIME_SHIFT, shift_value))
-				# Accumulate shifted time
-				curr_time += shift_value
+					result.append(Event(EventType.TIME_SHIFT, shift_sum))
+				# Update time
+				curr_time += shift_sum
+			# End note
 			result.append(Event(EventType.NOTE_OFF, i[1]))
 	
 	# Return array
 	return result
 
 def event_to_midi_array(events):
-	"""
-	Take array of Event objects and convert to midi array
-	"""
-	# Holds the output midi array
-	midi_arr = []
-	# Holds the current velocity
-	curr_velocity = 100
-	# Holds the current time
-	curr_time = 0
-	# notes_on, contains notes that are currently on, {note:start_time}
-	notes_on = {}
-	# Debugging
-	total_errors = 0
-
-	for index, event in enumerate(events):
-		if event.event_type is EventType.NOTE_ON:
-			# If the note is present in the dictionary it will be added to the midi_arr
-			if notes_on.get(event.value) is not None:
-				midi_arr.append(pretty_midi.Note(velocity=int(curr_velocity), pitch=event.value, start=notes_on.get(event.value), end=curr_time))
-			# Regardless we add/update the note into the dictionary
-			notes_on.update({event.value : curr_time})
-		elif event.event_type is EventType.NOTE_OFF:
-			#Ensures the note has been turned off previously and sends a warning otherwise
-			if notes_on.get(event.value) is not None:
-				print("VEL:", curr_velocity)
-				midi_arr.append(pretty_midi.Note(velocity=int(curr_velocity), pitch=event.value, start=notes_on.get(event.value), end=curr_time))
-				notes_on.pop(event.value)
-			else:
-				print("Error: Note", str(event.value), "is trying to be turned off when it has never been turned on [", index, "]")
-				total_errors += 1
-		elif event.event_type is EventType.TIME_SHIFT:
-			#Increments curr_time
-			curr_time += event.value
-		elif event.event_type is EventType.SET_VELOCITY:
-			curr_velocity = event.value
-		else:
-			continue
-	# If any of the notes in the dictionary haven't been turned off yet, we end them at the curr_time 
-	for note in notes_on.keys():
-		midi_arr.append(pretty_midi.Note(velocity=int(curr_velocity), pitch=note, start=notes_on.get(note), end=curr_time))
-	
-	print("TOTAL ERRORS:", total_errors)
-	return midi_arr
-
-def event_to_midi_array2(events):
 	"""
 	Take array of Event objects and convert to midi array
 	"""
@@ -225,14 +179,17 @@ def event_to_midi_array2(events):
 		if event.event_type is EventType.SET_VELOCITY:
 			# Set the velocity
 			curr_velocity = event.value
+
 		# IF this is a time shifting event
 		elif event.event_type is EventType.TIME_SHIFT:
 			# Shift the time by the given value
 			curr_time += event.value
+
 		# If this event starts a note
 		elif event.event_type is EventType.NOTE_ON:
 			# Accumulate this note and await its end time
 			notes_on[event.value] = [curr_velocity, curr_time]
+
 		# If this event ends a note
 		elif event.event_type is EventType.NOTE_OFF:
 			# Verify that this note can be ended
@@ -247,6 +204,7 @@ def event_to_midi_array2(events):
 			else:
 				print("Error: Note", str(event.value), "is trying to be turned off when it has never been turned on [", index, "]")
 				total_errors += 1
+
 	print("TOTAL ERRORS:", total_errors)
 	# Return the completed array
 	return result
