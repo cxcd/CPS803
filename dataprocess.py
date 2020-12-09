@@ -186,6 +186,7 @@ def midi_array_to_event2(midi_as_array):
 		
 		# Check if there are notes that are playing that end in between this time and the current time
 		notes_to_end = [x for x in active_notes if future_time >= x[3]]
+		notes_to_end = sorted(notes_to_end, key=itemgetter(3)) # Sort by end times
 		active_notes[:] = (x for x in active_notes if future_time < x[3])
 		# For the notes that will finish
 		for j in notes_to_end:
@@ -229,6 +230,7 @@ def midi_array_to_event2(midi_as_array):
 
 	# If there are still notes in midi_acc
 	if active_notes:
+		active_notes = sorted(active_notes, key=itemgetter(3)) # Sort by end times
 		for i in active_notes:
 			if i[3] > curr_time:
 				# Apply time shift
@@ -264,7 +266,6 @@ def event_to_midi_array(events):
 	# Debugging
 	total_errors = 0
 	for index, event in enumerate(events):
-		print("E:", event)
 		# If this event changes the velocity
 		if event.event_type is EventType.SET_VELOCITY:
 			# Set the velocity

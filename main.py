@@ -78,7 +78,7 @@ def main(read_path="", write_path="output.midi"):
 	
 	# Get midi
 	# midi_array = util.read_processed_midi(1) # 8 is a good test case (16 errors)
-	midi_array = util.midi_to_array(util.here("testmidi/timetest.midi"))
+	midi_array = util.midi_to_array(util.here("testmidi/mii.midi"))
 	#print("ORIGINAL LENGTH", len(midi_array))
 	#print("ORIGINAL ARRAY", midi_array)
 	# Convert to events
