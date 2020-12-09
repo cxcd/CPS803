@@ -76,10 +76,11 @@ def main(read_path="", write_path="output.midi"):
 	# twinkle_midi = pretty_midi.PrettyMIDI(util.here("twinkle.midi")).instruments[0].notes
 
 	# Get midi
-	midi_array = util.read_processed_midi(0)
+	midi_array = util.read_processed_midi(8)
 	print("ORIGINAL LENGTH", len(midi_array))
 	# Convert to events
 	midi_events = dataprocess.midi_array_to_event(midi_array)
+	print("ORIGINAL", midi_events[82:100])
 	# Convert to indices
 	midi_event_indices = []
 	for i in midi_events:
@@ -88,17 +89,12 @@ def main(read_path="", write_path="output.midi"):
 	midi_events2 = []
 	for i in midi_event_indices:
 		midi_events2.append(dataprocess.index_to_event(i))
+	#print("NEW", midi_events2[82:100])
 	# Convert back to midi
 	midi_array2 = dataprocess.event_to_midi_array(midi_events2)
 	print("NEW LENGTH", len(midi_array2))
 	# Save
 	util.write_piano_midi(midi_array2, util.here("output.midi"))
-	#e = dataprocess.Event(dataprocess.EventType.TIME_SHIFT, 0.01)
-	#print(dataprocess.event_to_index(e))
-
-
-
-
 
 if __name__ == '__main__':
 	main(read_path="maestro-v2.0.0")
