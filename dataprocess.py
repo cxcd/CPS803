@@ -94,11 +94,12 @@ def midi_array_to_event(midi_as_array):
 		time_diff = i[2] - curr_time
 		# If the difference is greater than 1, we need many time shifts
 		if time_diff > 1:
-			temp_val = 0
-			for t in range(int((i[2]-curr_time)/time_step)):
-				temp_val += time_step
-				result.append(Event(EventType.TIME_SHIFT, time_step))
-			shift_value = temp_val
+			n = int(time_diff)
+			r = int((time_diff - n) * 100) / 100
+			for t in range(n):
+				result.append(Event(EventType.TIME_SHIFT, 1))
+			result.append(Event(EventType.TIME_SHIFT, r))
+			shift_value = n + r
 		# If the difference is less than the greatest possible time step, shift by the time step
 		# If its too low, consider it a simultaneous note
 		elif time_step > time_diff >= 0.007:
@@ -125,7 +126,7 @@ def midi_array_to_event(midi_as_array):
 		for vel in range(20):
 			if temp_velocity < (vel + 1) * bin_size:
 				if prev_vel_range != vel:
-					result.append(Event(EventType.SET_VELOCITY, (vel + 1) * bin_size))
+					result.append(Event(EventType.SET_VELOCITY, int((vel + 1) * bin_size)))
 					prev_vel_range = vel
 				break
 
