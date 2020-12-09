@@ -76,7 +76,6 @@ def midi_array_to_event(midi_as_array):
 	if offset > 0:
 		midi[:,2] -= offset
 		midi[:,3] -= offset
-	print("ARRAY:\n",midi)
 	# Init result
 	result = []
 	# Accumulators for computing start and end times
@@ -119,17 +118,17 @@ def midi_array_to_event(midi_as_array):
 				# End the note
 				result.append(Event(EventType.NOTE_OFF, j[1]))
 		# If the velocity has changed by a large enough amount, add a set velocity event
-		tempVelocity = i[0]
+		temp_velocity = i[0]
 		bin_size = (127/20)
 		for vel in range(20):
-			if tempVelocity < (vel+1)*bin_size:
+			if temp_velocity < (vel + 1) * bin_size:
 				if prev_vel_range != vel:
-					result.append(Event(EventType.SET_VELOCITY, (vel+1)*bin_size ))
+					result.append(Event(EventType.SET_VELOCITY, (vel + 1) * bin_size))
 					prev_vel_range = vel
 				break
 		# Start the note
 		result.append(Event(EventType.NOTE_ON, i[1]))
-		
+
 	# If there are still notes in midi_acc
 	if midi_acc:
 		for i in midi_acc:
