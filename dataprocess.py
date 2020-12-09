@@ -160,7 +160,7 @@ def midi_array_to_event(midi_as_array):
 	# Return array
 	return result
 
-# THIS ONE LOOKS LIKE IT WORKS BUT MAYBE IT DOESNT ???
+# Fixed timing issues compared to previous function
 def midi_array_to_event2(midi_as_array):
 	"""
 	Take converted MIDI array and convert to array of Event objects
