@@ -76,7 +76,7 @@ def main(read_path="", write_path="output.midi"):
 	# twinkle_midi = pretty_midi.PrettyMIDI(util.here("twinkle.midi")).instruments[0].notes
 
 	# Get midi
-	midi_array = util.read_processed_midi(13) # 8 is a good test case (16 errors)
+	midi_array = util.read_processed_midi(16) # 8 is a good test case (16 errors)
 	print("ORIGINAL LENGTH", len(midi_array))
 	# Convert to events
 	midi_events = dataprocess.midi_array_to_event(midi_array)

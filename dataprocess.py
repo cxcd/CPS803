@@ -74,11 +74,6 @@ def midi_array_to_event(midi_as_array):
 	"""
 	# Sort MIDI array
 	midi = np.array(sorted(midi_as_array, key=itemgetter(2)))
-	# Offset the start times for music that starts late
-	offset = midi[0][2] - 0.5
-	if offset > 0:
-		midi[:,2] -= offset
-		midi[:,3] -= offset
 	# Init result
 	result = []
 	# Accumulators for computing start and end times
