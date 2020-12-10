@@ -205,8 +205,6 @@ def midi_array_to_event2(midi_as_array):
 			# Update time
 			curr_time += end_shift_sum
 			# End the note
-			#if (j[1] == 52):
-			#	print("OFF")
 			result.append(Event(EventType.NOTE_OFF, j[1]))
 
 		# Shift the time up to the start of the current note
@@ -231,8 +229,6 @@ def midi_array_to_event2(midi_as_array):
 				break
 
 		# Start the note
-		#if (i[1] == 52):
-		#		print("ON")
 		result.append(Event(EventType.NOTE_ON, i[1]))
 
 	# If there are still notes in midi_acc
