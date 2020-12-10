@@ -2,6 +2,7 @@ import pretty_midi
 from enum import Enum
 from operator import itemgetter
 import math
+import numpy as np
 
 time_step = 0.01
 bin_size = (127/20)
@@ -33,7 +34,7 @@ class Event():
 		self.event_type = _type
 		self.value = _value
 	def __repr__(self):
-		return "(" + self.event_type.name + " : " + str(self.value) + ")"
+		return "(" + self.event_type.name + " : " + str(self.value) + ")\n"
 
 def index_to_event(index):
 	"""
@@ -183,13 +184,15 @@ def midi_array_to_event2(midi_as_array):
 		# Get time shift values up to the start of this note
 		shift_values, shift_sum = get_shift_value(i[2] - curr_time)
 		future_time = curr_time + shift_sum
-		
+
 		# Check if there are notes that are playing that end in between this time and the current time
 		notes_to_end = [x for x in active_notes if future_time >= x[3]]
 		notes_to_end = sorted(notes_to_end, key=itemgetter(3)) # Sort by end times
 		active_notes[:] = (x for x in active_notes if future_time < x[3])
+
 		# For the notes that will finish
 		for j in notes_to_end:
+			
 			# Shift up to the end of that note
 			end_shift_values, end_shift_sum = get_shift_value(j[3] - curr_time)
 			if end_shift_values:
@@ -197,11 +200,13 @@ def midi_array_to_event2(midi_as_array):
 					if s > 0:
 						result.append(Event(EventType.TIME_SHIFT, s))
 			else:
-				if shift_sum > 0:
+				if end_shift_sum > 0:
 					result.append(Event(EventType.TIME_SHIFT, end_shift_sum))
 			# Update time
 			curr_time += end_shift_sum
 			# End the note
+			#if (j[1] == 52):
+			#	print("OFF")
 			result.append(Event(EventType.NOTE_OFF, j[1]))
 
 		# Shift the time up to the start of the current note
@@ -226,6 +231,8 @@ def midi_array_to_event2(midi_as_array):
 				break
 
 		# Start the note
+		#if (i[1] == 52):
+		#		print("ON")
 		result.append(Event(EventType.NOTE_ON, i[1]))
 
 	# If there are still notes in midi_acc
