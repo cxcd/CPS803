@@ -162,6 +162,19 @@ def load_all_predata(n=None):
 	data.view(np.float)
 	return torch.from_numpy(data)
 
+# TODO Fix the type errors in this function, range should be to n+1
+def load_all_predata_event_indices(n=None):
+	data = []
+	# Set the range
+	if (n is None) or (n > max_files):
+		n = max_files
+	# Get the data
+	for i in range(n+1):
+		data.append(read_processed_event_index(i))
+	data = np.array(data)
+	data.view(np.float)
+	return torch.from_numpy(data)
+
 def load_all_predata_pitchonly(n=None):
 	data = []
 	# Set the range
