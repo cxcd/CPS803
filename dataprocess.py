@@ -265,9 +265,12 @@ def event_to_midi_array(events):
 	# Holds the current time
 	curr_time = 0
 	# notes_on, contains notes that are currently on, {note:start_time}
-	notes_on = {}
+	notes_on = []
 	# Debugging
 	total_errors = 0
+	#Temporary Note Variable
+	temp_note = None
+
 	for index, event in enumerate(events):
 		# If this event changes the velocity
 		if event.event_type is EventType.SET_VELOCITY:
@@ -282,22 +285,27 @@ def event_to_midi_array(events):
 		# If this event starts a note
 		elif event.event_type is EventType.NOTE_ON:
 			# Accumulate this note and await its end time
-			notes_on[event.value] = [curr_velocity, curr_time]
-
+			notes_on.append([event.value,curr_velocity, curr_time])
 		# If this event ends a note
 		elif event.event_type is EventType.NOTE_OFF:
 			# Verify that this note can be ended
-			if notes_on.get(event.value) is not None:
+			for note_on in notes_on:
+				if note_on[0] == event.value:
+					temp_note = note_on
+					# Remove it from the list
+					notes_on.remove(note_on)
+					break
+
+			if temp_note is not None:
 				# Add it to the result
-				vel = notes_on[event.value][0]
-				start_time = notes_on[event.value][1]
+				vel = temp_note[1]
+				start_time = temp_note[2]
 				result.append(pretty_midi.Note(velocity=int(vel), pitch=int(event.value), start=start_time, end=curr_time))
-				# Remove it from the dictionary
-				del notes_on[event.value]
 			# If it cannot be ended, show a warning
 			else:
-				print("Error: Note", str(event.value), "is trying to be turned off when it has never been turned on [", index, "]")
+				print("Error: Note", str(event.value), "is trying to be turned off when it has never been turned on [", index, "] at current time ",curr_time)
 				total_errors += 1
+			temp_note = None
 		else:
 			print("Error: Object is not an Event")
 			total_errors += 1
