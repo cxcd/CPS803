@@ -21,7 +21,6 @@ util.write_piano_midi(util.pitches_to_midi(some_array))
 def get_processed_midi(file_num):
 	return dataprocess.pretty_midi_to_event(util.here("twinkle.midi"))
 
-
 def get_pitches(n):
 	data = []
 	# Get the data
@@ -37,16 +36,16 @@ def gen(input):
 	model = util.load_model("models/pitch_model.pt")
 	data = np.array(list(input))
 	data = torch.from_numpy(data).long()
-	generate.gen(model, data)
+	output = generate.gen(model, data)
+	util.write_piano_midi(util.pitchesvelocity_to_midi(output), "output2.midi")
 
 def prepare_data(read_path):
 	# Uncomment this if you dont have the processed midi files
 	#util.write_processed_midi(read_path)
-	util.write_all_processed_midi_to_events()
+	util.write_all_processed_midi_to_event_indices()
 	return
 
 def main(read_path="", write_path="output.midi"):
-
 	# RUN THIS FIRST TO GENERATE THE PROCESSED DATASET
 	# util.write_processed_midi(read_path)
 
@@ -60,8 +59,8 @@ def main(read_path="", write_path="output.midi"):
 		8, 	# n_heads
 		4, 	# depth
 		32, # seq_length
-		128,# n_tokens 
-		377, # emb_size 
+		378,# n_tokens 
+		128, # emb_size 
 		850,# n_batches 
 		64, # batch_size 
 		50, # test_every 

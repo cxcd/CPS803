@@ -19,14 +19,17 @@ def split_padded(a,n):
 	return np.split(np.concatenate((a,np.zeros(padding))),n)
 
 def get_data():
-	""" Incredibly naive approach to making data sets,
-		only for proof of concept usage. """
+	""" Get data """
+	print("Getting data...")
 	data = util.load_all_predata_event_indices()
+	train = np.array(data[0:1000])
+	valid = np.array(data[1000:1200])
+	print("Complete!")
 	# data = util.load_all_predata_pitchonly(10)
 	# data = np.loadtxt(data_path, dtype=chr)
-	train, half_data2 = split_padded(data, 2)
-	valid, test = split_padded(half_data2, 2)
-	return torch.from_numpy(train), torch.from_numpy(valid), torch.from_numpy(test)
+	#train, half_data2 = split_padded(data, 2)
+	#valid, test = split_padded(half_data2, 2)
+	return torch.from_numpy(train), torch.from_numpy(valid)
 
 
 def sample(lnprobs, temperature=0.0):
@@ -68,10 +71,10 @@ def gen(model, input, size=100, temp=0.5):
 			data.append(c.item())
 			# Make next prediction informed by this prediction
 			input = torch.cat([input[1:], c[None]], dim=0)
-		print(data[:30])
-		util.write_piano_midi(util.pitchesvelocity_to_midi(data), "output2.midi")
+		#print(data[:30])
 		#print()
 		#print(pitches)
+		return data
 
 def train(n_heads=8, depth=4, seq_length=32, n_tokens=256, emb_size=128, n_batches=500, batch_size=64, test_every=50, lr=0.0001, warmup=100, seed=-1, data_sub=1000, output_path="genmodel.pt"):
 	"""
@@ -85,7 +88,7 @@ def train(n_heads=8, depth=4, seq_length=32, n_tokens=256, emb_size=128, n_batch
 		torch.manual_seed(seed)
 
 	# Load training data
-	data_train, data_valid, data_test = get_data()
+	data_train, data_valid = get_data()
 	# Create the model
 	model = tf.GenTransformer(
 				emb=emb_size, 
@@ -171,10 +174,11 @@ def train(n_heads=8, depth=4, seq_length=32, n_tokens=256, emb_size=128, n_batch
 				bits_per_byte = abs(bits / data_sub.size(0))
 				print(f' epoch {i}: {bits_per_byte:.4} bits per byte')
 				print("Loss:", loss.item())
-				# Monitor progress by generating data based on the test data
+				# Monitor progress by generating data based on the validation data
 				seedfr = random.randint(0, data_valid.size(0) - seq_length)
-				# input = data_valid[seedfr:seedfr + seq_length].to(torch.long)
-				#gen(model, input)
+				input = data_valid[seedfr:seedfr + seq_length].to(torch.long)
+				output_valid = gen(model, input)
+				print(output_valid[:30])
 
 	# Save the model when we're done training it
 	util.save_model(model, output_path)

@@ -13,6 +13,12 @@ processed_events_dir = 'processed_event_indices_files/'
 # Number of files in the data set
 max_files = 1281
 
+"""
+0 - 999 train
+1000 - 199 - valid
+1200 - 1280 - train
+"""
+
 # Twinkle twinkle example midi
 twinkle_notes = np.array([
 		# C major
@@ -171,10 +177,10 @@ def load_all_predata_event_indices(n=None):
 		n = max_files
 	# Get the data
 	for i in range(n+1):
-		data.append(read_processed_event_index(i))
+		data = np.append(data, read_processed_event_index(i))
 	data = np.array(data)
 	data.view(np.float)
-	return torch.from_numpy(data)
+	return data
 
 def load_all_predata_pitchonly(n=None):
 	data = []
@@ -328,6 +334,8 @@ def write_all_processed_midi_to_event_indices():
 		event_arr = dataprocess.midi_array_to_event2(midi_arr)
 		index_arr = dataprocess.events_to_indices(event_arr)
 		np.save(processed_events_dir+'event_index_arr_'+str(i)+'.npy', index_arr)
+		print("Saving file", i, "...")
+	print("Complete!")
 
 def read_processed_event_index(file_num):
 	"""

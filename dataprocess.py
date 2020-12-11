@@ -29,6 +29,7 @@ class Event():
 	128 - 256 = NOTE_OFF
 	257 - 357 = TIME_SHIFT
 	358 - 377 = SET_VELOCITY
+	Total 378 Tokens
 	"""
 	def __init__(self, _type, _value):
 		self.event_type = _type
