@@ -81,10 +81,6 @@ def get_shift_value(time_diff):
 			shift_values.append(1)
 		shift_values.append(r)
 		shift_sum = n + r
-	# If the difference is less than the greatest possible time step, shift by the time step
-	# If its too low, consider it a simultaneous note
-	elif time_step > time_diff >= 0.007:
-		shift_sum = time_step
 	# Otherwise shift normally
 	else:
 		shift_sum = int((time_diff) * 100) / 100
