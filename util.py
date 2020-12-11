@@ -303,19 +303,21 @@ def new_load_model(model_num):
 		return torch.load(model_path)
 	return []
 
-def write_all_processed_midi_to_events():
+def write_all_processed_midi_to_event_indices():
 	"""
-	Takes all processed midi, processes it into events and saves them into the processed_events_dir
+	Takes all processed midi, processes it into events, then indices and saves them into the processed_indices_dir
 	"""
 	create_dir(processed_events_dir) 
 	for i in range(max_files+1):
 		midi_arr = read_processed_midi(i)
 		event_arr = dataprocess.midi_array_to_event2(midi_arr)
-		np.save(processed_events_dir+'event_arr_'+str(i)+'.npy', event_arr)
+		index_arr = dataprocess.events_to_indices(event_arr)
+		np.save(processed_events_dir+'event_index_arr_'+str(i)+'.npy', index_arr)
 
-def read_processed_event(file_num):
+
+def read_processed_event_index(file_num):
 	"""
 	Read a processed event file given its file number
 	"""
-	return np.load(processed_events_dir+'event_arr_'+str(file_num)+'.npy')
+	return np.load(processed_events_dir+'event_index_arr_'+str(file_num)+'.npy')
 
