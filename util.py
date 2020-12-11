@@ -265,8 +265,8 @@ def save_on_train(model, losses, num_epochs, params, model_name=None):
 	loss_plot.set_ylabel('loss')
 	loss_plot.legend()
 	fig.savefig(dir_path+'loss.png')
-	np.savetxt(dir_path+'losses_'+str(model_num), losses)
-	np.savetxt(dir_path+'params_'+str(model_num), params)
+	np.savetxt(dir_path+'losses_'+str(model_num)+'.txt', losses)
+	np.savetxt(dir_path+'params_'+str(model_num)+'.txt', params)
 	torch.save(model, dir_path+model_name)
 
 # Saves the input and midi_file to a folder
@@ -281,14 +281,14 @@ def save_on_gen(input, midi_file, model_num=None, gen_num=None):
 		if(os.path.exists(models_path+'model_'+str(model_num)+'/gens/gen_'+str(gen_num)+'_input.npy')):
 			gen_num += 1
 	dir_path = models_path+'model_'+str(model_num)+'/gens/'
-	np.savetxt(dir_path+'gen_'+str(gen_num)+'_input', input)
+	np.savetxt(dir_path+'gen_'+str(gen_num)+'_input.txt', input)
 	write_piano_midi(midi_file, dir_path+'gen_'+str(gen_num)+'.midi')
 
 
 # Returns empty list if it does not exist
 # Grabs the params of the specified model number
 def load_param(model_num):
-	param_path = models_path+'model_'+model_num+'/params_'+model_num+'.npy'
+	param_path = models_path+'model_'+str(model_num)+'/params_'+str(model_num)+'.txt'
 	if(os.path.exists(param_path)):
 		return np.loadtxt(param_path)
 	return []
@@ -296,7 +296,8 @@ def load_param(model_num):
 # Returns empty list if it does not exist
 # Grabs the model of the specified model number
 def new_load_model(model_num):
-	model_path = models_path+'model_'+model_num+'/trained_model_'+model_num+'.pt'
+	model_path = models_path+'model_'+str(model_num)+'/trained_model_'+str(model_num)+'.pt'
 	if(os.path.exists(model_path)):
 		return torch.load(model_path)
 	return []
+
