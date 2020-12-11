@@ -21,11 +21,13 @@ def split_padded(a,n):
 def get_data():
 	""" Incredibly naive approach to making data sets,
 		only for proof of concept usage. """
-	data = util.load_all_predata_pitchonly(10)
+	data = util.load_all_predata_event_indices()
+	# data = util.load_all_predata_pitchonly(10)
 	# data = np.loadtxt(data_path, dtype=chr)
 	train, half_data2 = split_padded(data, 2)
 	valid, test = split_padded(half_data2, 2)
 	return torch.from_numpy(train), torch.from_numpy(valid), torch.from_numpy(test)
+
 
 def sample(lnprobs, temperature=0.0):
 	"""
