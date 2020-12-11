@@ -34,7 +34,7 @@ def get_data():
 
 def sample(lnprobs, temperature=0.0):
 	"""
-	Sample an element from the model. Temp of 1 follows the distribution, 0 follows the maximum probability.
+	Sample an element from the model. Temp of 0 follows the maximum probability, else follow the distribution.
 	"""
 	# Return max value if there is no temperature
 	if temperature == 0.0:
