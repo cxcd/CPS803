@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 
 # Directory to load processed midi files
 processed_dir = 'processed_midi_files\\'
+# Directory to load processed event files
+processed_events_dir = 'processed_event_indices_files/'
 # Number of files in the data set
 max_files = 1281
 
