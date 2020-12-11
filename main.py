@@ -50,22 +50,37 @@ def main(read_path="", write_path="output.midi"):
 	# print("ROWS: ", mid_data.shape[0], "COLS: ", mid_data.shape[1])
 	
 	# Training the model
-	"""
-	generate.train(
-		n_heads=8, 
-		depth=4, 
-		seq_length=32, 
-		n_tokens=128, 
-		emb_size=64, 
-		n_batches=850, 
-		batch_size=64, 
-		test_every=50, 
-		lr=0.000065, 
-		warmup=100, 
-		seed=-1,
-		output_path="models/pitch_model.pt"
+	params = [
+		8, 	# n_heads
+		4, 	# depth
+		32, # seq_length
+		128,# n_tokens 
+		377, # emb_size 
+		850,# n_batches 
+		64, # batch_size 
+		50, # test_every 
+		0.000065, # lr 
+		100,# warmup 
+		-1 # seed
+		]
+	
+	losses = generate.train(
+		n_heads=params[0], 
+		depth=params[1], 
+		seq_length=params[2], 
+		n_tokens=params[3], 
+		emb_size=params[4], 
+		n_batches=params[5], 
+		batch_size=params[6], 
+		test_every=params[7], 
+		lr=params[8], 
+		warmup=params[9], 
+		seed=params[10],
+		output_path="model.pt"
 		)
-	"""
+	model = util.load_model("model.pt")
+	util.save_on_train(model, losses, params[5], params, model_name=None)
+	
 	"""
 	# Generate text
 
@@ -75,10 +90,11 @@ def main(read_path="", write_path="output.midi"):
 	#print(get_pitches(900)[:10])
 	# twinkle_midi = pretty_midi.PrettyMIDI(util.here("twinkle.midi")).instruments[0].notes
 
-	
+	# util.write_all_processed_midi_to_event_indices()
 	# Get midi
-	# midi_array = util.read_processed_midi(1) # 8 is a good test case (16 errors)
-	midi_array = util.midi_to_array(util.here("testmidi/mii.midi"))
+	"""
+	midi_array = util.read_processed_midi(0) # 8 is a good test case (16 errors)
+	#midi_array = util.midi_to_array(util.here("testmidi/mii.midi"))
 	#print("ORIGINAL LENGTH", len(midi_array))
 	#print("ORIGINAL ARRAY", midi_array)
 	# Convert to events
@@ -99,6 +115,7 @@ def main(read_path="", write_path="output.midi"):
 	#print("NEW LENGTH", len(midi_array2))
 	# Save
 	util.write_piano_midi(midi_array2, util.here("output.midi"))
+	"""
 
 if __name__ == '__main__':
 	main(read_path="maestro-v2.0.0")
