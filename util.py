@@ -2,6 +2,7 @@ import os
 import numpy as np
 import pretty_midi
 import torch
+import dataprocess
 import matplotlib.pyplot as plt
 
 # Directory to load processed midi files
