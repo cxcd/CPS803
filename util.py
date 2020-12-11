@@ -3,6 +3,7 @@ import numpy as np
 import pretty_midi
 import torch
 import matplotlib.pyplot as plt
+import dataprocess
 
 # Directory to load processed midi files
 processed_dir = 'processed_midi_files\\'
@@ -313,7 +314,6 @@ def write_all_processed_midi_to_event_indices():
 		event_arr = dataprocess.midi_array_to_event2(midi_arr)
 		index_arr = dataprocess.events_to_indices(event_arr)
 		np.save(processed_events_dir+'event_index_arr_'+str(i)+'.npy', index_arr)
-
 
 def read_processed_event_index(file_num):
 	"""

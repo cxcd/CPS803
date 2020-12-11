@@ -39,6 +39,12 @@ def gen(input):
 	data = torch.from_numpy(data).long()
 	generate.gen(model, data)
 
+def prepare_data(read_path):
+	# Uncomment this if you dont have the processed midi files
+	#util.write_processed_midi(read_path)
+	util.write_all_processed_midi_to_events()
+	return
+
 def main(read_path="", write_path="output.midi"):
 
 	# RUN THIS FIRST TO GENERATE THE PROCESSED DATASET
