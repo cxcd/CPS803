@@ -169,7 +169,6 @@ def load_all_predata(n=None):
 	data.view(np.float)
 	return torch.from_numpy(data)
 
-# TODO Fix the type errors in this function, range should be to n+1
 def load_all_predata_event_indices(n=None):
 	data = []
 	# Set the range
