@@ -37,6 +37,7 @@ def main(read_path="", write_path="output.midi"):
 	
 	# Training the model
 	"""
+	# Uncomment to train model
 	params = [
 		8, 	# n_heads
 		4, 	# depth
@@ -68,9 +69,13 @@ def main(read_path="", write_path="output.midi"):
 	model = util.load_model("model.pt")
 	util.save_on_train(model, losses, params[5], params, model_name=None)
 	
+
+	# Uncomment to use a specified file to generate
 	index_arr = util.read_processed_event_index(1200)
 	gen(index_arr[:20])
 	"""
+
+	# Uncomment to use ceg(2).midi to generate
 	midi_arr = util.midi_to_array('ceg(2).midi')
 	event_arr = dataprocess.midi_array_to_event2(midi_arr)
 	index_arr = dataprocess.events_to_indices(event_arr)
