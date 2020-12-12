@@ -169,6 +169,7 @@ def load_all_predata(n=None):
 	data.view(np.float)
 	return torch.from_numpy(data)
 
+# TODO Fix the type errors in this function, range should be to n+1
 def load_all_predata_event_indices(n=None):
 	data = []
 	# Set the range
@@ -280,7 +281,7 @@ def save_on_train(model, losses, num_epochs, params, model_name=None):
 		dir_path = models_path+'model_'+model_num+'/'
 	create_dir(dir_path)
 	create_dir(dir_path+'gens/')
-	x_axis = np.arange(num_epochs)
+	x_axis = np.arange(num_epochs-1)
 	fig, (loss_plot) = plt.subplots(1,1)
 	loss_plot.plot(x_axis, losses)
 	loss_plot.set_xlabel('epochs')
@@ -295,16 +296,16 @@ def save_on_train(model, losses, num_epochs, params, model_name=None):
 # Will save to the latest model, and will create new gen file if no gen_num is specified
 # Specified gen_num will overwrite a file 
 # Specified model_num will be saved into that model
-def save_on_gen(input, midi_file, model_num=None, gen_num=None):
+def save_on_gen(input, midi_arr, model_num=None, gen_num=None):
 	if model_num==None:
 		model_num = get_latest_model_num()
 	if gen_num==None:
 		gen_num = get_latest_gen_num(model_num)
-		if(os.path.exists(models_path+'model_'+str(model_num)+'/gens/gen_'+str(gen_num)+'_input.npy')):
+		if(os.path.exists(models_path+'model_'+str(model_num)+'/gens/gen_'+str(gen_num)+'_input.txt')):
 			gen_num += 1
 	dir_path = models_path+'model_'+str(model_num)+'/gens/'
 	np.savetxt(dir_path+'gen_'+str(gen_num)+'_input.txt', input)
-	write_piano_midi(midi_file, dir_path+'gen_'+str(gen_num)+'.midi')
+	write_piano_midi(midi_arr, dir_path+'gen_'+str(gen_num)+'.midi')
 
 
 # Returns empty list if it does not exist
@@ -317,7 +318,9 @@ def load_param(model_num):
 
 # Returns empty list if it does not exist
 # Grabs the model of the specified model number
-def new_load_model(model_num):
+def new_load_model(model_num=None):
+	if model_num is None:
+		model_num = get_latest_model_num()
 	model_path = models_path+'model_'+str(model_num)+'/trained_model_'+str(model_num)+'.pt'
 	if(os.path.exists(model_path)):
 		return torch.load(model_path)
