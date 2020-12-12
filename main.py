@@ -3,40 +3,51 @@ import generate
 import torch
 import numpy as np
 import util
+import dataprocess
+import os
+import pretty_midi
+from operator import itemgetter
+
 
 def gen(input):
 	print("Generated text: ")
-	model = util.load_model("models/pitch_model.pt")
+	model = util.new_load_model()
 	data = np.array(list(input))
 	data = torch.from_numpy(data).long()
-	output = generate.gen(model, data)
-	util.write_piano_midi(util.pitchesvelocity_to_midi(output), "output2.midi")
+	index_arr = generate.gen(model, data, 700)
+	event_arr = dataprocess.indices_to_events(index_arr)
+	midi_arr = dataprocess.event_to_midi_array(event_arr)
+	util.save_on_gen(input, midi_arr, model_num=None, gen_num=None)
+	print(event_arr)
 
 def prepare_data(read_path):
-	util.write_processed_midi(read_path) # COMMENT THIS OUT IF YOU ALREADY HAVE THE OLD PROCESSED DATA
+	# Uncomment this if you dont have the processed midi files
+	util.write_processed_midi(read_path)
 	util.write_all_processed_midi_to_event_indices()
 	return
 
 def main(read_path="", write_path="output.midi"):
-	
 	# RUN THIS FIRST TO GENERATE THE PROCESSED DATASET
-	"""
-	prepare_data(read_path)
-	return
-	"""
+	# util.write_processed_midi(read_path)
 
+	# Just testing
+	#mid_data = util.read_processed_midi(0)
+	#print(mid_data)
+	# print("ROWS: ", mid_data.shape[0], "COLS: ", mid_data.shape[1])
+	
 	# Training the model
+	"""
 	params = [
 		8, 	# n_heads
 		4, 	# depth
 		32, # seq_length
 		378,# n_tokens 
-		128, # emb_size 
-		850,# n_batches 
-		64, # batch_size 
+		64, # emb_size 
+		900,# n_batches 
+		32, # batch_size 
 		50, # test_every 
-		0.000065, # lr 
-		100,# warmup 
+		0.000005, # lr 
+		250,# warmup 
 		-1 # seed
 		]
 	
@@ -57,12 +68,14 @@ def main(read_path="", write_path="output.midi"):
 	model = util.load_model("model.pt")
 	util.save_on_train(model, losses, params[5], params, model_name=None)
 	
+	index_arr = util.read_processed_event_index(1200)
+	gen(index_arr[:20])
 	"""
-	# Generate text
-
-	gen([61, 65, 61, 73, 65])
-	#, 55, 59, 62 print(util.load_all_predata_pitchonly(2))
-	"""
+	midi_arr = util.midi_to_array('ceg(2).midi')
+	event_arr = dataprocess.midi_array_to_event2(midi_arr)
+	index_arr = dataprocess.events_to_indices(event_arr)
+	gen(index_arr)
+	
 
 if __name__ == '__main__':
 	main(read_path="maestro-v2.0.0")
