@@ -250,6 +250,15 @@ def midi_array_to_event2(midi_as_array):
 	# Return array
 	return result
 
+def indices_to_events(indices):
+	"""
+	Takes an array of indices and returns an array of events
+	"""
+	event_arr = []
+	for index in indices:
+		event_arr.append(index_to_event(index))
+	return event_arr
+
 def events_to_indices(events):
 	"""
 	Takes an array of events and returns an array of indices
