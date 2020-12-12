@@ -23,6 +23,7 @@ def split_padded(a,n):
 def get_data():
 	""" Get data """
 	print("Getting data...")
+	# Uncomment to train on ceg()
 	midi_arr = util.midi_to_array('ceg(2).midi')
 	event_arr = dataprocess.midi_array_to_event2(midi_arr)
 	index_arr = dataprocess.events_to_indices(event_arr)
@@ -36,6 +37,7 @@ def get_data():
 	valid = np.array(data[700:900])
 	#
 	#
+	# Uncomment to train on whole dataset
 	#data = util.load_all_predata_event_indices()
 	#train = np.array(data[0:1000])
 	#valid = np.array(data[1000:1200])
