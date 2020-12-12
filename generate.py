@@ -10,6 +10,7 @@ import random
 import numpy as np
 import tqdm, math
 import util
+import dataprocess
 
 def split_padded(a,n):
 	"""
@@ -18,19 +19,28 @@ def split_padded(a,n):
 	padding = (-len(a))%n
 	return np.split(np.concatenate((a,np.zeros(padding))),n)
 
+
 def get_data():
 	""" Get data """
 	print("Getting data...")
-	data = util.load_all_predata_event_indices()
-	train = np.array(data[0:1000])
-	valid = np.array(data[1000:1200])
+	midi_arr = util.midi_to_array('ceg(2).midi')
+	event_arr = dataprocess.midi_array_to_event2(midi_arr)
+	index_arr = dataprocess.events_to_indices(event_arr)
+	print(index_arr)
+	data = []
+	for i in range(1000):
+		data = np.append(data, index_arr)
+	data = np.array(data)
+	data.view(np.float)
+	train = np.array(data[0:700])
+	valid = np.array(data[700:900])
+	#
+	#
+	#data = util.load_all_predata_event_indices()
+	#train = np.array(data[0:1000])
+	#valid = np.array(data[1000:1200])
 	print("Complete!")
-	# data = util.load_all_predata_pitchonly(10)
-	# data = np.loadtxt(data_path, dtype=chr)
-	#train, half_data2 = split_padded(data, 2)
-	#valid, test = split_padded(half_data2, 2)
 	return torch.from_numpy(train), torch.from_numpy(valid)
-
 
 def sample(lnprobs, temperature=0.0):
 	"""
@@ -89,6 +99,7 @@ def train(n_heads=8, depth=4, seq_length=32, n_tokens=256, emb_size=128, n_batch
 
 	# Load training data
 	data_train, data_valid = get_data()
+	losses = []
 	# Create the model
 	model = tf.GenTransformer(
 				emb=emb_size, 
@@ -125,6 +136,7 @@ def train(n_heads=8, depth=4, seq_length=32, n_tokens=256, emb_size=128, n_batch
 		# Get the loss
 		loss = F.nll_loss(output.transpose(2, 1), target, reduction='mean')
 		loss.backward()
+		losses.append(loss.item())
 		# Clip the gradients
 		nn.utils.clip_grad_norm_(model.parameters(), 1)
 
@@ -133,7 +145,7 @@ def train(n_heads=8, depth=4, seq_length=32, n_tokens=256, emb_size=128, n_batch
 		# Validate every so often, compute compression then generate
 		if i != 0 and (i % test_every == 0 or i == n_batches - 1):
 			# TODO sort of arbitrary, make this rigorous
-			upto = data_valid.size(0) if i == n_batches - 1 else data_sub
+			upto = data_valid.size(0) if i == n_batches - 1 else 100
 			data_sub = data_valid[:upto]
 			# 
 			with torch.no_grad():
@@ -179,6 +191,7 @@ def train(n_heads=8, depth=4, seq_length=32, n_tokens=256, emb_size=128, n_batch
 				input = data_valid[seedfr:seedfr + seq_length].to(torch.long)
 				output_valid = gen(model, input)
 				print(output_valid[:30])
+	return losses
 
 	# Save the model when we're done training it
 	util.save_model(model, output_path)
