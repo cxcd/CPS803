@@ -9,7 +9,7 @@ This project was developed using Anaconda Navigator. With Navigator, the environ
 conda env create -f environment.yml
 ```
 
-To preprocess and prepare the dataset for use by the model, run the `prepare_data()` function in the main file once, with the path to the data passed as a parameter. This will create a folder containing all the processed data.
+To preprocess and prepare the dataset for use by the model, run the `prepare_data()` function in the main file once, with the path to the dataset passed as a parameter. This will create a folder containing all the processed data.
 ```
 prepare_data("maestro-v2.0.0")
 ```
