@@ -17,35 +17,35 @@ prepare_data("maestro-v2.0.0")
 To train the model on the data, and save the results, run the following functions in the main function:
 ```
 params = [
-		8, 	  # n_heads
-		4, 	  # depth
-		32,	  # seq_length
-		378,	  # n_tokens 
-		64, 	  # emb_size 
-		900,	  # n_batches 
-		32, 	  # batch_size 
-		50, 	  # test_every 
-		0.000005, # lr 
-		250,	  # warmup 
-		-1 	  # seed
-		]
+	8, 	  # n_heads
+	4, 	  # depth
+	32,	  # seq_length
+	378,	  # n_tokens 
+	64, 	  # emb_size 
+	900,	  # n_batches 
+	32, 	  # batch_size 
+	50, 	  # test_every 
+	0.000005, # lr 
+	250,	  # warmup 
+	-1 	  # seed
+	]
 	
-	losses = generate.train(
-		n_heads=params[0], 
-		depth=params[1], 
-		seq_length=params[2], 
-		n_tokens=params[3], 
-		emb_size=params[4], 
-		n_batches=params[5], 
-		batch_size=params[6], 
-		test_every=params[7], 
-		lr=params[8], 
-		warmup=params[9], 
-		seed=params[10],
-		output_path="model.pt"
-		)
-	model = util.load_model("model.pt")
-	util.save_on_train(model, losses, params[5], params, model_name=None)
+losses = generate.train(
+	n_heads=params[0], 
+	depth=params[1], 
+	seq_length=params[2], 
+	n_tokens=params[3], 
+	emb_size=params[4], 
+	n_batches=params[5], 
+	batch_size=params[6], 
+	test_every=params[7], 
+	lr=params[8], 
+	warmup=params[9], 
+	seed=params[10],
+	output_path="model.pt"
+	)
+model = util.load_model("model.pt")
+util.save_on_train(model, losses, params[5], params, model_name=None)
 ```
 To generate a result from an existing model, run the following function in the main function:
 ```
