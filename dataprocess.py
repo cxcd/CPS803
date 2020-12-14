@@ -26,10 +26,10 @@ class Event():
 		 SET_VELOCITY has a velocity (0, 127) inclusive
 	The Index Format is as follows:
 	0 - 127 = NOTE_ON
-	128 - 256 = NOTE_OFF
-	257 - 357 = TIME_SHIFT
-	358 - 377 = SET_VELOCITY
-	Total 378 Tokens
+	128 - 255 = NOTE_OFF
+	256 - 355 = TIME_SHIFT
+	356 - 375 = SET_VELOCITY
+	Total 376 Tokens (0-indexed)
 	"""
 	def __init__(self, _type, _value):
 		self.event_type = _type
