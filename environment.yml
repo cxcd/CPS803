@@ -1,0 +1,13 @@
+# To Run: conda env create -f environment.yml
+name: FinalProject
+channels:
+- pytorch
+- defaults
+dependencies:
+- python
+- pytorch
+- numpy
+- matplotlib
+- pip
+- pip:
+  - pretty_midi
