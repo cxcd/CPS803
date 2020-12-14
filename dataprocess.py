@@ -41,7 +41,7 @@ def index_to_event(index):
 	"""
 	Convert an index to its respective Event object in the format.
 	"""
-	# Vocab of 378 elements
+	# Vocab of 376 elements
 	# Range is not inclusive, goes from a to b - 1
 	if index in range(0, 128):
 		# Return Note On event
