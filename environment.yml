@@ -11,3 +11,4 @@ dependencies:
 - pip
 - pip:
   - pretty_midi
+  - tqdm
