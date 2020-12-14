@@ -14,12 +14,6 @@ processed_events_dir = 'processed_event_indices_files/'
 max_files = 1281
 big_max_files = 3845
 
-"""
-0 - 999 train
-1000 - 199 - valid
-1200 - 1280 - train
-"""
-
 # Twinkle twinkle example midi
 twinkle_notes = np.array([
 		# C major
@@ -183,6 +177,10 @@ def load_all_predata_event_indices(n=None):
 	return data
 
 def load_all_predata_event_indices_augmented(n=None):
+	"""
+	Load all the preprocessed augmented data
+	If n is specified, load only that number of files, otherwise load them all
+	"""
 	data = []
 	# Set the range
 	if (n is None) or (n > big_max_files):
@@ -239,13 +237,17 @@ def load_model(path):
 # A variable to determine the directory to store the models in
 models_path = 'models/'
 
-#Creates a directory at the specified path
 def create_dir(dir_path):
+	"""
+	Creates a directory at the specified path
+	"""
 	if(not os.path.exists(dir_path)):
 		os.mkdir(dir_path)
 
-#Gets the latest model number in the models directory
 def get_latest_model_num():
+	"""
+	Gets the latest model number in the models directory
+	"""
 	if(not os.path.exists(models_path)):
 		create_dir(models_path)
 	model_num = 0
@@ -257,8 +259,10 @@ def get_latest_model_num():
 					model_num = temp_num
 	return model_num
 
-#Gets the latest gen_num, if model_num is not given the latest model_num will be given
 def get_latest_gen_num(model_num=None):
+	"""
+	Gets the latest gen_num, if model_num is not given the latest model_num will be given
+	"""
 	if model_num==None:
 		model_num = get_latest_model_num()
 	gen_num = 0
@@ -270,13 +274,16 @@ def get_latest_gen_num(model_num=None):
 					gen_num = temp_num
 	return gen_num
 
-# Creates a loss vs epoch plot, Creates a directory for the current model,
-# then saves the model, plot, loss, and params for the model
-# params - An array containing all the params in order
-# losses - An array containing all the losses
-# num_epoch - Number of epochs
-# model_name must follow format trained_model_x.pt, where x is an integer 
+
 def save_on_train(model, losses, num_epochs, params, model_name=None):
+	"""
+	Creates a loss vs epoch plot, Creates a directory for the current model,
+	then saves the model, plot, loss, and params for the model
+	params - An array containing all the params in order
+	losses - An array containing all the losses
+	num_epoch - Number of epochs
+	model_name must follow format trained_model_x.pt, where x is an integer 
+	"""
 	create_dir(models_path)
 	model_num = 0
 	if model_name==None:
@@ -304,11 +311,14 @@ def save_on_train(model, losses, num_epochs, params, model_name=None):
 	np.savetxt(dir_path+'params_'+str(model_num)+'.txt', params)
 	torch.save(model, dir_path+model_name)
 
-# Saves the input and midi_file to a folder
-# Will save to the latest model, and will create new gen file if no gen_num is specified
-# Specified gen_num will overwrite a file 
-# Specified model_num will be saved into that model
+
 def save_on_gen(input, midi_arr, model_num=None, gen_num=None):
+	"""
+	Saves the input and midi_file to a folder
+	Will save to the latest model, and will create new gen file if no gen_num is specified
+	Specified gen_num will overwrite a file 
+	Specified model_num will be saved into that model
+	"""
 	if model_num==None:
 		model_num = get_latest_model_num()
 	if gen_num==None:
@@ -320,17 +330,23 @@ def save_on_gen(input, midi_arr, model_num=None, gen_num=None):
 	write_piano_midi(midi_arr, dir_path+'gen_'+str(gen_num)+'.midi')
 
 
-# Returns empty list if it does not exist
-# Grabs the params of the specified model number
+
 def load_param(model_num):
+	"""
+	Returns empty list if it does not exist
+	Grabs the params of the specified model number
+	"""
 	param_path = models_path+'model_'+str(model_num)+'/params_'+str(model_num)+'.txt'
 	if(os.path.exists(param_path)):
 		return np.loadtxt(param_path)
 	return []
 
-# Returns empty list if it does not exist
-# Grabs the model of the specified model number
+
 def new_load_model(model_num=None):
+	"""
+	Returns empty list if it does not exist
+	Grabs the model of the specified model number
+	"""
 	if model_num is None:
 		model_num = get_latest_model_num()
 	model_path = models_path+'model_'+str(model_num)+'/trained_model_'+str(model_num)+'.pt'

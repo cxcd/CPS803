@@ -70,14 +70,6 @@ def main(read_path="", write_path="output.midi"):
 		)
 	model = util.load_model("model.pt")
 	util.save_on_train(model, losses, params[5], params, model_name=None)
-	
-
-	# Uncomment to use ceg(2).midi to generate
-	#midi_arr = util.midi_to_array('testmidi/ceg.midi')
-	#event_arr = dataprocess.midi_array_to_event2(midi_arr)
-	#index_arr = dataprocess.events_to_indices(event_arr)
-	#gen(index_arr)
-	
 
 if __name__ == '__main__':
 	main(read_path="maestro-v2.0.0")
