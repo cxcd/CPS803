@@ -10,7 +10,7 @@ from operator import itemgetter
 
 
 def gen(input):
-	print("Generated text: ")
+	print("Generated data: ")
 	model = util.new_load_model()
 	data = np.array(list(input))
 	data = torch.from_numpy(data).long()
@@ -21,19 +21,19 @@ def gen(input):
 	print(event_arr)
 
 def prepare_data(read_path):
-	# Uncomment this if you dont have the processed midi files
-	#util.write_processed_midi(read_path)
+	util.write_processed_midi(read_path)
 	util.write_all_processed_midi_to_event_indices_augmented()
 	return
 
 def main(dataset_path="maestro-v2.0.0"):
 	# RUN THIS FIRST TO GENERATE THE PROCESSED DATASET
-	#prepare_data(dataset_path)
-	#return
+	prepare_data(dataset_path)
+	return
 	
 	# Uncomment to use a specified file to generate
 	"""
-	index_arr = util.read_processed_event_index(1200)
+	# The parameter is the file number
+	index_arr = util.read_processed_event_index(3000)
 	gen(index_arr[:20])
 	return
 	"""
