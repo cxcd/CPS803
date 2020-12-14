@@ -26,9 +26,9 @@ def prepare_data(read_path):
 	util.write_all_processed_midi_to_event_indices_augmented()
 	return
 
-def main(read_path="", write_path="output.midi"):
+def main(dataset_path="maestro-v2.0.0"):
 	# RUN THIS FIRST TO GENERATE THE PROCESSED DATASET
-	#prepare_data(read_path)
+	#prepare_data(dataset_path)
 	#return
 	
 	# Uncomment to use a specified file to generate
@@ -72,4 +72,4 @@ def main(read_path="", write_path="output.midi"):
 	util.save_on_train(model, losses, params[5], params, model_name=None)
 
 if __name__ == '__main__':
-	main(read_path="maestro-v2.0.0")
+	main()
