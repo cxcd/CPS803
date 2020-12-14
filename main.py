@@ -9,31 +9,33 @@ import pretty_midi
 from operator import itemgetter
 
 
-def gen(input):
+def gen(input, size=100):
 	print("Generated data: ")
 	model = util.new_load_model()
 	data = np.array(list(input))
 	data = torch.from_numpy(data).long()
-	index_arr = generate.gen(model, data, 700)
+	index_arr = generate.gen(model, data, size)
 	event_arr = dataprocess.indices_to_events(index_arr)
 	midi_arr = dataprocess.event_to_midi_array(event_arr)
 	util.save_on_gen(input, midi_arr, model_num=None, gen_num=None)
 	print(event_arr)
 
 def prepare_data(read_path):
+	# Comment this out if you have done the preliminary processing
 	util.write_processed_midi(read_path)
+	# Give this function a parameter of how much of the dataset to write if you wish to use less than the whole dataset
 	util.write_all_processed_midi_to_event_indices_augmented()
 	return
 
-def main(dataset_path="maestro-v2.0.0"):
+def main(dataset_path="maestro-v2.0.0", generation_index=0):
 	# RUN THIS FIRST TO GENERATE THE PROCESSED DATASET
 	prepare_data(dataset_path)
 	return
 	
 	# Uncomment to use a specified file to generate
 	"""
-	# The parameter is the file number
-	index_arr = util.read_processed_event_index(3000)
+	# The parameter is the file number to be sampled for generation
+	index_arr = util.read_processed_event_index(generation_index)
 	gen(index_arr[:20])
 	return
 	"""
