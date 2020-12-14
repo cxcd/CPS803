@@ -22,21 +22,23 @@ def gen(input):
 
 def prepare_data(read_path):
 	# Uncomment this if you dont have the processed midi files
-	util.write_processed_midi(read_path)
-	util.write_all_processed_midi_to_event_indices()
+	#util.write_processed_midi(read_path)
+	util.write_all_processed_midi_to_event_indices_augmented()
 	return
 
 def main(read_path="", write_path="output.midi"):
 	# RUN THIS FIRST TO GENERATE THE PROCESSED DATASET
-	# util.write_processed_midi(read_path)
-
-	# Just testing
-	#mid_data = util.read_processed_midi(0)
-	#print(mid_data)
-	# print("ROWS: ", mid_data.shape[0], "COLS: ", mid_data.shape[1])
+	#prepare_data(read_path)
+	#return
 	
-	# Training the model
+	# Uncomment to use a specified file to generate
 	"""
+	index_arr = util.read_processed_event_index(1200)
+	gen(index_arr[:20])
+	return
+	"""
+	# Training the model
+	
 	# Uncomment to train model
 	params = [
 		8, 	# n_heads
@@ -70,16 +72,11 @@ def main(read_path="", write_path="output.midi"):
 	util.save_on_train(model, losses, params[5], params, model_name=None)
 	
 
-	# Uncomment to use a specified file to generate
-	index_arr = util.read_processed_event_index(1200)
-	gen(index_arr[:20])
-	"""
-
 	# Uncomment to use ceg(2).midi to generate
-	midi_arr = util.midi_to_array('ceg(2).midi')
-	event_arr = dataprocess.midi_array_to_event2(midi_arr)
-	index_arr = dataprocess.events_to_indices(event_arr)
-	gen(index_arr)
+	#midi_arr = util.midi_to_array('testmidi/ceg.midi')
+	#event_arr = dataprocess.midi_array_to_event2(midi_arr)
+	#index_arr = dataprocess.events_to_indices(event_arr)
+	#gen(index_arr)
 	
 
 if __name__ == '__main__':

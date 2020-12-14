@@ -23,10 +23,13 @@ def split_padded(a,n):
 def get_data():
 	""" Get data """
 	print("Getting data...")
-	# Uncomment to train on ceg()
-	midi_arr = util.midi_to_array('ceg(2).midi')
-	event_arr = dataprocess.midi_array_to_event2(midi_arr)
-	index_arr = dataprocess.events_to_indices(event_arr)
+	data = np.array(util.load_all_predata_event_indices_augmented())
+	total_size = len(data)
+	train_size = int(total_size * 0.7)
+	valid_size = int(total_size * 0.2)
+	train = np.array(data[0 : train_size])
+	valid = np.array(data[train_size : train_size + valid_size])
+	"""
 	print(index_arr)
 	data = []
 	for i in range(1000):
@@ -35,6 +38,7 @@ def get_data():
 	data.view(np.float)
 	train = np.array(data[0:700])
 	valid = np.array(data[700:900])
+	"""
 	#
 	#
 	# Uncomment to train on whole dataset
@@ -69,10 +73,11 @@ def gen(model, input, size=100, temp=0.5):
 			model = model.cuda()
 		input = Variable(input)
 		#  Print the input
-		print('[', end='', flush=True)
+		print('IN: [', end='', flush=True)
 		for i in input:
 			print(i.item(), end=', ', flush=True)
 		print(']', end='', flush=True)
+		print()
 		# Get generated data
 
 		for i in range(size):
@@ -192,7 +197,7 @@ def train(n_heads=8, depth=4, seq_length=32, n_tokens=256, emb_size=128, n_batch
 				seedfr = random.randint(0, data_valid.size(0) - seq_length)
 				input = data_valid[seedfr:seedfr + seq_length].to(torch.long)
 				output_valid = gen(model, input)
-				print(output_valid[:30])
+				print("OUT:", output_valid[:30])
 	return losses
 
 	# Save the model when we're done training it

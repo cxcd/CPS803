@@ -12,6 +12,7 @@ processed_dir = 'processed_midi_files\\'
 processed_events_dir = 'processed_event_indices_files/'
 # Number of files in the data set
 max_files = 1281
+big_max_files = 3845
 
 """
 0 - 999 train
@@ -169,12 +170,23 @@ def load_all_predata(n=None):
 	data.view(np.float)
 	return torch.from_numpy(data)
 
-# TODO Fix the type errors in this function, range should be to n+1
 def load_all_predata_event_indices(n=None):
 	data = []
 	# Set the range
 	if (n is None) or (n > max_files):
 		n = max_files
+	# Get the data
+	for i in range(n+1):
+		data = np.append(data, read_processed_event_index(i))
+	data = np.array(data)
+	data.view(np.float)
+	return data
+
+def load_all_predata_event_indices_augmented(n=None):
+	data = []
+	# Set the range
+	if (n is None) or (n > big_max_files):
+		n = big_max_files
 	# Get the data
 	for i in range(n+1):
 		data = np.append(data, read_processed_event_index(i))
@@ -337,6 +349,46 @@ def write_all_processed_midi_to_event_indices():
 		index_arr = dataprocess.events_to_indices(event_arr)
 		np.save(processed_events_dir+'event_index_arr_'+str(i)+'.npy', index_arr)
 		print("Saving file", i, "...")
+	print("Complete!")
+
+def write_all_processed_midi_to_event_indices_augmented():
+	"""
+	Takes all processed midi, processes it into events, then indices and saves them into the processed_indices_dir
+	"""
+	create_dir(processed_events_dir)
+	
+	fnum = 0
+	for i in range(max_files+1):
+		midi_arr = read_processed_midi(i)
+		event_arr = dataprocess.midi_array_to_event2(midi_arr)
+		index_arr = dataprocess.events_to_indices(event_arr)
+		# First augmentation
+		midi_arr2 = midi_arr
+		for j in midi_arr2:
+			j[1] += 3
+			if j[1] > 127:
+				j[1] = 127
+		event_arr2 = dataprocess.midi_array_to_event2(midi_arr2)
+		index_arr2 = dataprocess.events_to_indices(event_arr2)
+		# Second augmentation
+		midi_arr3 = midi_arr
+		for j in midi_arr3:
+			j[1] -= 3
+			if j[1] < 0:
+				j[1] = 0
+		event_arr3 = dataprocess.midi_array_to_event2(midi_arr3)
+		index_arr3 = dataprocess.events_to_indices(event_arr3)
+		# Save three versions, the original and two augmented
+		np.save(processed_events_dir+'event_index_arr_'+str(fnum)+'.npy', index_arr)
+		print("Saving file", fnum, "...")
+		fnum += 1
+		np.save(processed_events_dir+'event_index_arr_'+str(fnum)+'.npy', index_arr2)		
+		print("Saving file", fnum, "...")
+		fnum += 1
+		np.save(processed_events_dir+'event_index_arr_'+str(fnum)+'.npy', index_arr3)
+		print("Saving file", fnum, "...")
+		fnum += 1
+
 	print("Complete!")
 
 def read_processed_event_index(file_num):
