@@ -46,13 +46,13 @@ def index_to_event(index):
 	if index in range(0, 128):
 		# Return Note On event
 		return Event(EventType.NOTE_ON, index)
-	elif index in range(128, 257):
+	elif index in range(128, 256):
 		# Return Note Off event
 		return Event(EventType.NOTE_OFF, index - 128)
-	elif index in range(257, 358):
+	elif index in range(256, 357):
 		# Return Time Shift event
-		return Event(EventType.TIME_SHIFT, (index - 257) / 100)
-	elif index in range(358, 378):
+		return Event(EventType.TIME_SHIFT, (index - 256) / 100)
+	elif index in range(357, 377):
 		# Return Set Velocity event
 		return Event(EventType.SET_VELOCITY, (127 * (index - 357)) / 20)
 
@@ -66,7 +66,7 @@ def event_to_index(event):
 	elif event.event_type is EventType.NOTE_OFF:
 		return int(event.value + 128)
 	elif event.event_type is EventType.TIME_SHIFT:
-		return int((event.value * 100) + 257)
+		return int((event.value * 100) + 256)
 	elif event.event_type is EventType.SET_VELOCITY:
 		return int( ( ( (event.value * 20) / 127)+0.1) + 357)
 
