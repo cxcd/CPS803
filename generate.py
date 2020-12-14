@@ -23,6 +23,7 @@ def split_padded(a,n):
 def get_data():
 	""" Get data """
 	print("Getting data...")
+	# Specify how much of the dataset to load as a parameter to this util function
 	data = np.array(util.load_all_predata_event_indices_augmented())
 	total_size = len(data)
 	train_size = int(total_size * 0.7)

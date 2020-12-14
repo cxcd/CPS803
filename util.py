@@ -367,14 +367,15 @@ def write_all_processed_midi_to_event_indices():
 		print("Saving file", i, "...")
 	print("Complete!")
 
-def write_all_processed_midi_to_event_indices_augmented():
+def write_all_processed_midi_to_event_indices_augmented(n=None):
 	"""
 	Takes all processed midi, processes it into events, then indices and saves them into the processed_indices_dir
 	"""
 	create_dir(processed_events_dir)
-	
+	if (n is None) or (n > max_files):
+		n = max_files
 	fnum = 0
-	for i in range(max_files+1):
+	for i in range(n+1):
 		midi_arr = read_processed_midi(i)
 		event_arr = dataprocess.midi_array_to_event2(midi_arr)
 		index_arr = dataprocess.events_to_indices(event_arr)
