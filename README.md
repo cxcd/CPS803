@@ -9,26 +9,25 @@ This project was developed using Anaconda Navigator. With Navigator, the environ
 conda env create -f environment.yml
 ```
 
-To preprocess and prepare the dataset for use by the model, run the `prepare_data()` function in the main file once, with the path to the data passed as a parameter.
+To preprocess and prepare the dataset for use by the model, run the `prepare_data()` function in the main file once, with the path to the data passed as a parameter. This will create a folder containing all the processed data.
 ```
 prepare_data("maestro-v2.0.0")
-return
 ```
 
 To train the model on the data, and save the results, run the following functions in the main function:
 ```
 params = [
-		8, 	# n_heads
-		4, 	# depth
-		32, # seq_length
-		378,# n_tokens 
-		64, # emb_size 
-		900,# n_batches 
-		32, # batch_size 
-		50, # test_every 
+		8, 	  # n_heads
+		4, 	  # depth
+		32,	  # seq_length
+		378,	  # n_tokens 
+		64, 	  # emb_size 
+		900,	  # n_batches 
+		32, 	  # batch_size 
+		50, 	  # test_every 
 		0.000005, # lr 
-		250,# warmup 
-		-1 # seed
+		250,	  # warmup 
+		-1 	  # seed
 		]
 	
 	losses = generate.train(
