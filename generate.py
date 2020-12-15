@@ -199,9 +199,9 @@ def train(n_heads=8, depth=4, seq_length=32, n_tokens=256, emb_size=128, n_batch
 				input = data_valid[seedfr:seedfr + seq_length].to(torch.long)
 				output_valid = gen(model, input)
 				print("OUT:", output_valid[:30])
+	util.save_model(model, output_path)
 	return losses
 
 	# Save the model when we're done training it
-	util.save_model(model, output_path)
 	# 
 	print("Finished training. Model saved to", output_path)
