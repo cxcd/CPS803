@@ -52,7 +52,7 @@ To generate a result from an existing model, run the following function in the m
 # Input is an array of indices in the processed format described in the paper
 gen(input)
 ```
-
+All of these functions are present in `main.py` and only need to be uncommented
 
 
 ## References
